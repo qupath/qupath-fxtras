@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    alias(libs.plugins.javafx)
+    id 'org.openjfx.javafxplugin' version '0.0.14'
 }
 
 ext.moduleName = 'qupath.fx'
@@ -12,21 +12,10 @@ description = "Extra classes built on JavaFX that are used to help create the Qu
 
 configurations {}
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    api libs.controlsfx
-    api libs.slf4j
-
-    testImplementation libs.junit
-}
-
 version = '0.1.0-SNAPSHOT'
 
 tasks.named('compileJava') {
-    // use the project's version or define one directly
+    // Use the project's version or define one directly
     options.javaModuleVersion = provider { version }
 }
 
@@ -44,10 +33,17 @@ java {
     }
     withSourcesJar()
     withJavadocJar()
+
+    // Optional ControlsFX support
+    java {
+        registerFeature('controlsfx') {
+            usingSourceSet(sourceSets.main)
+        }
+    }
 }
 
 javafx {
-    version = libs.versions.javafx.get()
+    version = 17
     modules = ["javafx.base",
                "javafx.controls",
                "javafx.graphics"]
@@ -68,4 +64,18 @@ tasks.withType(Javadoc).each { javadocTask ->
         javadocTask.options.addStringOption('Xdoclint:none', '-quiet')
     }
     javadocTask.options.encoding = 'UTF-8'
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api "org.slf4j:slf4j-api:2.0.0"
+
+    // Optional ControlsFX support (used for notifications)
+    controlsfxImplementation "org.controlsfx:controlsfx:11.1.2"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
 }

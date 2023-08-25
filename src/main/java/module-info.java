@@ -5,7 +5,7 @@ module qupath.fx {
     requires javafx.controls;
 
     requires org.slf4j;
-    requires org.controlsfx.controls;
+    requires static org.controlsfx.controls;
 
     exports qupath.fx.controls;
     exports qupath.fx.dialogs;

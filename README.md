@@ -6,4 +6,11 @@ This repository contains several Java modules that can help when working with Ja
 
 The code is developed alongside [QuPath](https://qupath.github.io), but is intended to be useful for other projects too.
 
-With this in mind, *these modules don't depend on QuPath* and can be used independently.
+## Dependencies
+
+Note that *these modules don't require other QuPath modules*.
+The dependencies are:
+
+* JavaFX
+* SLF4J-API
+* ControlsFX (optional)

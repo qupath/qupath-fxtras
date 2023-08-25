@@ -1,0 +1,69 @@
+package qupath.fx.dialogs;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import org.controlsfx.control.Notifications;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+class ControlsFXNotifications {
+
+    private static final Logger logger = LoggerFactory.getLogger(ControlsFXNotifications.class);
+
+    /**
+     * Show notification, making sure it is on the application thread
+     * @param notification
+     */
+    static void showNotifications(String title, String message, Alert.AlertType type) {
+        if (Dialogs.isHeadless()) {
+            logger.warn("Cannot show notifications in headless mode!");
+            return;
+        }
+        if (Platform.isFxApplicationThread()) {
+            switch (type) {
+                case CONFIRMATION:
+                    createNotifications().title(title).text(message).showConfirm();
+                    break;
+                case ERROR:
+                    createNotifications().title(title).text(message).showError();
+                    break;
+                case INFORMATION:
+                    createNotifications().title(title).text(message).showInformation();
+                    break;
+                case WARNING:
+                    createNotifications().title(title).text(message).showWarning();
+                    break;
+                case NONE:
+                default:
+                    createNotifications().title(title).text(message).show();
+                    break;
+            }
+        } else
+            Platform.runLater(() -> showNotifications(title, message, type));
+    }
+
+
+    /**
+     * Necessary to have owner when calling notifications (bug in controlsfx?).
+     */
+    private static Notifications createNotifications() {
+        var stage = Dialogs.getDefaultOwner();
+        var notifications = Notifications.create();
+        if (stage == null)
+            return notifications;
+
+        // 'Notifications' has a fixed color based on light/dark mode
+        // Here, we instead use the default color for text based on the current css for the scene
+        var scene = stage.getScene();
+        if (scene != null) {
+            var url = Dialogs.class.getClassLoader().getResource("qupath/fx/dialogs/notificationscustom.css");
+            String stylesheetUrl = url.toExternalForm();
+            if (!scene.getStylesheets().contains(stylesheetUrl))
+                scene.getStylesheets().add(stylesheetUrl);
+            notifications.styleClass("custom");
+        }
+
+        return notifications.owner(stage);
+    }
+
+}

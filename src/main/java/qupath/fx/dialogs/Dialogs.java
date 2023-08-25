@@ -16,12 +16,9 @@
 
 package qupath.fx.dialogs;
 
-import java.util.*;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.PopupWindow;
-import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,13 +40,22 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import qupath.fx.utils.FXUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Collection of static methods to help with showing information to a user, 
  * as well as requesting some basic input.
  * <p>
  * In general, 'showABCMessage' produces a dialog box that requires input from the user.
- * By contrast, 'showABCNotification' shows a message that will disappear without user input.
- * 
+ * By contrast, 'showABCNotification' shows a notification message that will disappear without user input -
+ * but only <b>if</b> ControlsFX is available.
+ * If ControlsFX is not available, the notification will be shown as a non-blocking dialog box.
+ *
  * @author Pete Bankhead
  *
  */
@@ -60,7 +66,9 @@ public class Dialogs {
 	private static Window primaryWindow;
 
 	private static ObservableList<String> knownExtensions = FXCollections.observableArrayList();
-	
+
+	private static boolean controlsFxMissing = false;
+
 	/**
 	 * Set the primary window, which will be used as the owner of dialogs
 	 * if no other window takes precedence (e.g. because it is modal or in focus).
@@ -322,7 +330,7 @@ public class Dialogs {
 		if (message == null)
 			message = "QuPath has encountered a problem, sorry.\nIf you can replicate it, please report it with 'Help > Report bug'.\n\n" + e;
 		if (!isHeadless())
-			showNotifications(createNotifications().title(title).text(message), AlertType.ERROR);
+			showNotification(title, message, AlertType.ERROR);
 	}
 
 	/**
@@ -333,7 +341,7 @@ public class Dialogs {
 	public static void showErrorNotification(final String title, final String message) {
 		logger.error(title + ": " + message);
 		if (!isHeadless())
-			showNotifications(createNotifications().title(title).text(message), AlertType.ERROR);
+			showNotification(title, message, AlertType.ERROR);
 	}
 
 	/**
@@ -344,7 +352,7 @@ public class Dialogs {
 	public static void showWarningNotification(final String title, final String message) {
 		logger.warn(title + ": " + message);
 		if (!isHeadless())
-			showNotifications(createNotifications().title(title).text(message), AlertType.WARNING);
+			showNotification(title, message, AlertType.WARNING);
 	}
 
 	/**
@@ -355,7 +363,7 @@ public class Dialogs {
 	public static void showInfoNotification(final String title, final String message) {
 		logger.info(title + ": " + message);
 		if (!isHeadless())
-			showNotifications(createNotifications().title(title).text(message), AlertType.INFORMATION);
+			showNotification(title, message, AlertType.INFORMATION);
 	}
 
 	/**
@@ -366,65 +374,29 @@ public class Dialogs {
 	public static void showPlainNotification(final String title, final String message) {
 		logger.info(title + ": " + message);
 		if (!isHeadless())
-			showNotifications(createNotifications().title(title).text(message), AlertType.NONE);
+			showNotification(title, message, AlertType.NONE);
 	}
-	
-	/**
-	 * Show notification, making sure it is on the application thread
-	 * @param notification
-	 */
-	private static void showNotifications(Notifications notification, AlertType type) {
-		if (isHeadless()) {
-			logger.warn("Cannot show notifications in headless mode!");
-			return;
-		}
-		if (Platform.isFxApplicationThread()) {
-			switch (type) {
-			case CONFIRMATION:
-				notification.showConfirm();
-				break;
-			case ERROR:
-				notification.showError();
-				break;
-			case INFORMATION:
-				notification.showInformation();
-				break;
-			case WARNING:
-				notification.showWarning();
-				break;
-			case NONE:
-			default:
-				notification.show();
-				break;			
+
+
+	private static void showNotification(String title, String message, Alert.AlertType type) {
+		// Attempt to show notification using ControlsFX, but fall back to a dialog if not available
+		if (!controlsFxMissing) {
+			try {
+				qupath.fx.dialogs.ControlsFXNotifications.showNotifications(title, message, type);
+				return;
+			} catch (NoClassDefFoundError e) {
+				logger.warn("ControlsFX notifications are not available, showing dialog instead");
+				controlsFxMissing = true;
 			}
-		} else
-			Platform.runLater(() -> showNotifications(notification, type));
-	}
-	
-	
-	/**
-	 * Necessary to have owner when calling notifications (bug in controlsfx?).
-	 */
-	private static Notifications createNotifications() {
-		var stage = getDefaultOwner();
-		var notifications = Notifications.create();
-		if (stage == null)
-			return notifications;
-
-		// 'Notifications' has a fixed color based on light/dark mode
-		// Here, we instead use the default color for text based on the current css for the scene
-		var scene = stage.getScene();
-		if (scene != null) {
-			var url = Dialogs.class.getClassLoader().getResource("qupath/fx/dialogs/notificationscustom.css");
-			String stylesheetUrl = url.toExternalForm();
-			if (!scene.getStylesheets().contains(stylesheetUrl))
-				scene.getStylesheets().add(stylesheetUrl);
-			notifications.styleClass("custom");
 		}
-
-		return notifications.owner(stage);
+		new Builder()
+				.buttons(ButtonType.OK)
+				.title(title)
+				.contentText(message)
+				.alertType(type)
+				.resizable()
+				.show();
 	}
-
 
 	/**
 	 * Show an error message.
@@ -547,7 +519,7 @@ public class Dialogs {
 	}
 	
 	
-	private static boolean isHeadless() {
+	static boolean isHeadless() {
 		return Window.getWindows().isEmpty();
 	}
 
@@ -724,7 +696,7 @@ public class Dialogs {
 		 * @return this builder
 		 */
 		public Builder buttons(String... buttonNames) {
-			var list = new ArrayList<ButtonType>();
+			List<ButtonType> list = new ArrayList<>();
 			for (String name : buttonNames) {
 				ButtonType type;
 				switch (name.toLowerCase()) {
@@ -881,5 +853,20 @@ public class Dialogs {
 		}
 		
 	}
-	
+
+	public static void main(String[] args) {
+		// This shows a notification if it can - to help confirm that ControlsFX is really optional
+		System.out.println("Starting main...");
+		Platform.startup(() -> {
+			var stage = new Stage();
+			stage.setTitle("Title");
+			stage.setScene(new Scene(new Label("Minimal stage")));
+			stage.show();
+			showInfoNotification("Info", "This is normal info");
+			showErrorNotification("Uh-oh", "This is erroneous!");
+		});
+		System.out.println("Ending main");
+	}
+
+
 }

@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
     id 'org.openjfx.javafxplugin' version '0.0.14'
 }
 
@@ -9,8 +10,6 @@ ext.jdkVersion = 17
 archivesBaseName = 'qupath-fx'
 description = "Extra classes built on JavaFX that are used to help create the QuPath user interface. " +
         "These don't depend on other QuPath modules, so can be reused elsewhere."
-
-configurations {}
 
 version = '0.1.0-SNAPSHOT'
 
@@ -47,11 +46,29 @@ javafx {
     modules = ["javafx.base",
                "javafx.controls",
                "javafx.graphics"]
-    configuration = 'api'
+    configurations = ['compileOnly', 'implementation', 'testImplementation']
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+/*
+ * Set encoding
+ */
+tasks.named('compileJava') {
+    options.encoding = 'UTF-8'
+}
+
+/*
+ * Manifest info
+ */
+jar {
+    manifest {
+        attributes("Implementation-Title": project.name,
+                "Implementation-Version": archiveVersion,
+                "Automatic-Module-Name": "io.github." + moduleName)
+    }
 }
 
 /*
@@ -78,4 +95,38 @@ dependencies {
     controlsfxImplementation "org.controlsfx:controlsfx:11.1.2"
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
+    testImplementation "ch.qos.logback:logback-classic:1.3.11"
+}
+
+
+publishing {
+    repositories {
+        maven {
+            name = "SciJava"
+            def releasesRepoUrl = uri("https://maven.scijava.org/content/repositories/releases")
+            def snapshotsRepoUrl = uri("https://maven.scijava.org/content/repositories/snapshots")
+            // Use gradle -Prelease publish
+            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+            credentials {
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASS")
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'io.github.qupath'
+            from components.java
+
+            pom {
+                licenses {
+                    license {
+                        name = 'Apache License v2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+            }
+        }
+    }
 }

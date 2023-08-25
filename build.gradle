@@ -1,0 +1,71 @@
+plugins {
+    id 'java-library'
+    alias(libs.plugins.javafx)
+}
+
+ext.moduleName = 'qupath.fx'
+ext.jdkVersion = 17
+
+archivesBaseName = 'qupath-fx'
+description = "Extra classes built on JavaFX that are used to help create the QuPath user interface. " +
+        "These don't depend on other QuPath modules, so can be reused elsewhere."
+
+configurations {}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api libs.controlsfx
+    api libs.slf4j
+
+    testImplementation libs.junit
+}
+
+version = '0.1.0-SNAPSHOT'
+
+tasks.named('compileJava') {
+    // use the project's version or define one directly
+    options.javaModuleVersion = provider { version }
+}
+
+java {
+    def version = project.findProperty('toolchain')
+    if (!version) {
+        version = jdkVersion
+    } else if (version.strip() == 'skip')
+        version = null
+    if (version != null) {
+        logger.info("Setting toolchain to {}", version)
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(version)
+        }
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+javafx {
+    version = libs.versions.javafx.get()
+    modules = ["javafx.base",
+               "javafx.controls",
+               "javafx.graphics"]
+    configuration = 'api'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+/*
+ * Use -PstrictJavadoc=true to fail on error with doclint (which is rather strict).
+ */
+def strictJavadoc = findProperty('strictJavadoc')
+
+tasks.withType(Javadoc).each { javadocTask ->
+    if (!strictJavadoc) {
+        javadocTask.options.addStringOption('Xdoclint:none', '-quiet')
+    }
+    javadocTask.options.encoding = 'UTF-8'
+}

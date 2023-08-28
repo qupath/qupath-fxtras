@@ -4,10 +4,10 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.14'
 }
 
-ext.moduleName = 'qupath.fx'
+ext.moduleName = 'qupath.fxtras'
 ext.jdkVersion = 17
 
-archivesBaseName = 'qupath-fx'
+archivesBaseName = 'qupath-fxtras'
 description = "Extra classes built on JavaFX that are used to help create the QuPath user interface. " +
         "These don't depend on other QuPath modules, so can be reused elsewhere."
 

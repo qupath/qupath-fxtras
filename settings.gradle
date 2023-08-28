@@ -1,0 +1,3 @@
+rootProject.name = 'qupath-fx'
+
+gradle.ext.qupathVersion = "0.4.3"

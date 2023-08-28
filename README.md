@@ -20,9 +20,10 @@ The main features are:
 ## Dependencies
 Dependencies are minimal to try to keep things simple. They are:
 
-* JavaFX
-* SLF4J-API
-* ControlsFX *(optional)*
+* Java 17
+* JavaFX 17
+* SLF4J-API 2.0.0
+* ControlsFX 11.1.2 *(optional)*
 
 
 ## License

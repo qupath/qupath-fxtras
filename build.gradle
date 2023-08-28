@@ -11,6 +11,7 @@ archivesBaseName = 'qupath-fxtras'
 description = "Extra classes built on JavaFX that are used to help create the QuPath user interface. " +
         "These don't depend on other QuPath modules, so can be reused elsewhere."
 
+group = 'io.github.qupath'
 version = '0.1.0-SNAPSHOT'
 
 tasks.named('compileJava') {
@@ -116,7 +117,6 @@ publishing {
 
     publications {
         mavenJava(MavenPublication) {
-            groupId = 'io.github.qupath'
             from components.java
 
             pom {

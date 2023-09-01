@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package qupath.fx.prefs.converters;
+package qupath.fx.utils.converters;
 
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * General {@link StringConverter} for URI objects, using their default string representation.
+ */
 public class UriConverter extends StringConverter<URI> {
 
     private final static Logger logger = LoggerFactory.getLogger(UriConverter.class);

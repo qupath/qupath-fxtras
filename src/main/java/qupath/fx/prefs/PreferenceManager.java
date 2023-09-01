@@ -27,11 +27,11 @@ import javafx.beans.property.StringProperty;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import qupath.fx.prefs.converters.EnumConverter;
-import qupath.fx.prefs.converters.FileConverter;
-import qupath.fx.prefs.converters.LocaleConverter;
-import qupath.fx.prefs.converters.PathConverter;
-import qupath.fx.prefs.converters.UriConverter;
+import qupath.fx.utils.converters.EnumConverter;
+import qupath.fx.utils.converters.FileConverter;
+import qupath.fx.utils.converters.LocaleConverter;
+import qupath.fx.utils.converters.PathConverter;
+import qupath.fx.utils.converters.UriConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -14,31 +14,36 @@
  * limitations under the License.
  */
 
-package qupath.fx.prefs.converters;
+package qupath.fx.utils.converters;
 
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class FileConverter extends StringConverter<File> {
+/**
+ * General {@link StringConverter} for Path objects, using their default string representation.
+ */
+public class PathConverter extends StringConverter<Path> {
 
-    private final static Logger logger = LoggerFactory.getLogger(FileConverter.class);
+    private final static Logger logger = LoggerFactory.getLogger(PathConverter.class);
 
     @Override
-    public String toString(File file) {
-        return file == null ? null : file.toString();
+    public String toString(Path path) {
+        return path == null ? null : path.toString();
     }
 
     @Override
-    public File fromString(String string) {
+    public Path fromString(String string) {
         if (string == null)
             return null;
         try {
-            return new File(string);
-        } catch (Exception e) {
-            logger.error("Could not parse file from " + string, e);
+            return Paths.get(string);
+        } catch (InvalidPathException e) {
+            logger.error("Could not parse path from " + string, e);
             return null;
         }
     }

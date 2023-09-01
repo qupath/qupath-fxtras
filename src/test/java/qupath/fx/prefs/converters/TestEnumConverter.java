@@ -17,6 +17,7 @@
 package qupath.fx.prefs.converters;
 
 import org.junit.jupiter.api.Test;
+import qupath.fx.utils.converters.EnumConverter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

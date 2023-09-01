@@ -18,6 +18,7 @@ package qupath.fx.prefs.converters;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import qupath.fx.utils.converters.FileConverter;
 
 import java.io.File;
 import java.util.Arrays;

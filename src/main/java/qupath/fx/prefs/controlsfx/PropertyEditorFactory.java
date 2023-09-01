@@ -1,3 +1,19 @@
+/**
+ * Copyright 2023 The University of Edinburgh
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package qupath.fx.prefs.controlsfx;
 
 import javafx.beans.value.ChangeListener;
@@ -24,7 +40,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * Extends {@link DefaultPropertyEditorFactory} to handle setting directories and creating choice editors.
+ * Extends {@link DefaultPropertyEditorFactory} from ControlsFX to offer more editors, including for directories,
+ * choices, locales, and choices from a searchable list.
  */
 public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
 
@@ -35,25 +52,22 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
     private Map<Class<?>, Function<?, String>> reformatTypes = Map.of();
 
     /**
-     * Helper method to reformat the display of enums (or other all-capital representations).
-     * @param obj
-     * @return
+     * A default reformatter that can be used to show enums in a nicer way
+     * (i.e. lowercase with the first letter capitalized, and underscores replaced with spaces).
      */
-    private static String reformatEnum(Object obj) {
-        var s = Objects.toString(obj);
-        s = s.replaceAll("_", " ");
-        if (Objects.equals(s, s.toUpperCase()))
-            return s.substring(0, 1) + s.substring(1).toLowerCase();
-        return s;
-    }
+    public Function<?, String> ENUM_REFORMATTER = PropertyEditorFactory::reformatEnum;
 
-    // Set this to true to automatically update labels & tooltips
-    // (but not categories, unfortunately, so it can look odd)
+    /**
+     * Set this to true to automatically update labels & tooltips
+     * (but not categories, unfortunately, so it can look odd)
+     */
     private boolean bindLabelText = false;
 
-    // Need to cache editors, since the property sheet is rebuilt often
-    // (but isn't smart enough to detach the editor listeners, so old ones hang around
-    // and respond to 'setValue()' calls)
+    /**
+     * We need to cache editors, because the property sheet can be rebuilt often -
+     * but isn't smart enough to detach the editor listeners, so old ones hang around
+     * and respond to 'setValue()' calls.
+     */
     private Map<PropertySheet.Item, PropertyEditor<?>> cache = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
@@ -107,6 +121,51 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
     }
 
     /**
+     * Get the editor associated with a particular item, assuming it has already been created
+     * and cached by this factory.
+     * @param item
+     * @return the editor if it exists, or null otherwise
+     */
+    public PropertyEditor<?> getEditor(PropertySheet.Item item) {
+        return cache.get(item);
+    }
+
+    /**
+     * Request that editors created with this factory reformat the default string display of the specified enum
+     * using the default reformatting method.
+     * @param cls
+     */
+    public void setReformatEnum(Class<? extends Enum> cls) {
+        setReformatType(cls, ENUM_REFORMATTER);
+    }
+
+    /**
+     * Request that editors created with this factory reformat the display of the specified type.
+     * @param cls
+     * @param formatter
+     */
+    public void setReformatType(Class<?> cls, Function<?, String> formatter) {
+        if (formatter == null)
+            reformatTypes.remove(cls);
+        else
+            reformatTypes.put(cls, formatter);
+    }
+
+    /**
+     * Helper method to reformat the display of enums (or other all-capital representations).
+     * @param obj
+     * @return
+     */
+    private static String reformatEnum(Object obj) {
+        var s = Objects.toString(obj);
+        s = s.replaceAll("_", " ");
+        if (Objects.equals(s, s.toUpperCase()))
+            return s.substring(0, 1) + s.substring(1).toLowerCase();
+        return s;
+    }
+
+
+    /**
      * Listener to bind the label & tooltip text (since these aren't accessible via the PropertySheet)
      */
     private static class ParentChangeListener implements ChangeListener<Parent> {
@@ -123,7 +182,6 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
         public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newValue) {
             if (newValue == null)
                 return;
-
             for (var labelLookup : newValue.lookupAll(".label")) {
                 if (labelLookup instanceof Label label) {
                     if (label.getLabelFor() == node) {

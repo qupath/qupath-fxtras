@@ -14,6 +14,4 @@ module qupath.fx {
     exports qupath.fx.prefs.annotations;
     exports qupath.fx.prefs.controlsfx;
     exports qupath.fx.utils;
-    exports qupath.fx.prefs.controlsfx.items;
-    exports qupath.fx.prefs.controlsfx.editors;
 }

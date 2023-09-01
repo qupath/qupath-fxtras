@@ -47,6 +47,7 @@ public class LocaleConverter extends StringConverter<Locale> {
      * @param baseLocale
      */
     public LocaleConverter(Locale baseLocale) {
+        Objects.requireNonNull(baseLocale, "Base locale cannot be null");
         this.baseLocale = baseLocale;
     }
 

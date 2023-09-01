@@ -34,7 +34,6 @@ import javafx.beans.property.StringProperty;
  * all at once.
  *
  * @author Pete Bankhead
- * @since v0.5.0
  */
 public class LocalizedResourceManager {
 
@@ -73,6 +72,15 @@ public class LocalizedResourceManager {
 	}
 
 	/**
+	 * Get the default bundle name to use where a bundle is not specified.
+	 * This may be null.
+	 * @return
+	 */
+	public String getDefaultBundleName() {
+		return defaultBundleName;
+	}
+
+	/**
 	 * Default method to get the bundle
 	 * @param name
 	 * @return
@@ -87,6 +95,31 @@ public class LocalizedResourceManager {
 		else
 			return ResourceBundle.getBundle(name, Locale.getDefault(Locale.Category.DISPLAY), control);
 	}
+
+	/**
+	 * Query whether a string is available in the default bundle.
+	 * @param key
+	 * @return
+	 */
+	public boolean hasString(String key) {
+		if (defaultBundleName == null)
+			return false;
+		return hasString(defaultBundleName);
+	}
+
+	/**
+	 * Query whether a string is available in the specified bundle.
+	 * @param bundleName
+	 * @param key
+	 * @return
+	 */
+	public boolean hasString(String bundleName, String key) {
+		var bundle = getBundle(bundleName);
+		if (bundle == null)
+			return false;
+		return bundle.containsKey(key);
+	}
+
 
 	/**
 	 * Get a string from the default bundle.

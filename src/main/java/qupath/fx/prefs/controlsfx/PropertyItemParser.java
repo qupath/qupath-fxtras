@@ -37,6 +37,7 @@ import qupath.fx.prefs.annotations.PrefCategory;
 import qupath.fx.prefs.annotations.StringPref;
 import qupath.fx.prefs.controlsfx.items.PropertyItem;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -101,7 +102,7 @@ public class PropertyItemParser {
         }
 
         for (var field : cls.getDeclaredFields()) {
-            if (!field.canAccess(obj) || !Property.class.isAssignableFrom(field.getType()))
+            if (Modifier.isStatic(field.getModifiers()) || !field.canAccess(obj) || !Property.class.isAssignableFrom(field.getType()))
                 continue;
             PropertySheet.Item item = null;
             try {

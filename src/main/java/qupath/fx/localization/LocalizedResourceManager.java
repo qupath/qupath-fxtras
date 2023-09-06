@@ -104,7 +104,7 @@ public class LocalizedResourceManager {
 	public boolean hasString(String key) {
 		if (defaultBundleName == null)
 			return false;
-		return hasString(defaultBundleName);
+		return hasString(defaultBundleName, key);
 	}
 
 	/**

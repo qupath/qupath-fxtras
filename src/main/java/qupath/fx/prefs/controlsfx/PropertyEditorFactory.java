@@ -34,6 +34,7 @@ import qupath.fx.prefs.controlsfx.items.PropertyItem;
 import qupath.fx.utils.FXUtils;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +50,7 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
      * We may wish to reformat the display of some types, e.g. enums that are
      * otherwise shown with all capitals.
      */
-    private Map<Class<?>, Function<?, String>> reformatTypes = Map.of();
+    private Map<Class<?>, Function<?, String>> reformatTypes = new HashMap<>();
 
     /**
      * A default reformatter that can be used to show enums in a nicer way
@@ -131,12 +132,13 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
     }
 
     /**
-     * Request that editors created with this factory reformat the default string display of the specified enum
+     * Request that editors created with this factory reformat the default string display of the specified enums
      * using the default reformatting method.
-     * @param cls
+     * @param enumTypes
      */
-    public void setReformatEnum(Class<? extends Enum> cls) {
-        setReformatType(cls, ENUM_REFORMATTER);
+    public void setReformatEnums(Class<? extends Enum>... enumTypes) {
+        for (var cls : enumTypes)
+            setReformatType(cls, ENUM_REFORMATTER);
     }
 
     /**

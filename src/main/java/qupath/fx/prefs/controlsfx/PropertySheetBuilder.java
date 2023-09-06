@@ -16,7 +16,9 @@
 
 package qupath.fx.prefs.controlsfx;
 
+import javafx.util.Callback;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.editor.PropertyEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qupath.fx.prefs.annotations.ColorPref;
@@ -57,6 +59,16 @@ public class PropertySheetBuilder {
      */
     public PropertySheetBuilder parser(PropertyItemParser parser) {
         this.parser = parser;
+        return this;
+    }
+
+    /**
+     * Set the property editor factory to use.
+     * @param factory
+     * @return this builder
+     */
+    public PropertySheetBuilder editorFactory(Callback<PropertySheet.Item, PropertyEditor<?>> factory) {
+        this.sheet.setPropertyEditorFactory(factory);
         return this;
     }
 

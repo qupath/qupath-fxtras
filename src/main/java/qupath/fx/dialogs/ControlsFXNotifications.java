@@ -18,6 +18,7 @@ package qupath.fx.dialogs;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.stage.Screen;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,6 @@ class ControlsFXNotifications {
 
     /**
      * Show notification, making sure it is on the application thread
-     * @param notification
      */
     static void showNotifications(String title, String message, Alert.AlertType type) {
         if (Dialogs.isHeadless()) {
@@ -82,8 +82,12 @@ class ControlsFXNotifications {
                 scene.getStylesheets().add(stylesheetUrl);
             notifications.styleClass("custom");
         }
-
-        return notifications.owner(stage);
+        // It looks better to use a screen as an owner, not a stage
+        var screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+        if (screens.isEmpty() || screens.size() > 1)
+            return notifications;
+        else
+            return notifications.owner(screens.get(0));
     }
 
 }

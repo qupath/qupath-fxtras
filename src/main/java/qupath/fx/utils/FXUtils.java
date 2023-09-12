@@ -22,12 +22,14 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.CheckComboBox;
@@ -38,6 +40,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -47,6 +50,9 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Static utility methods to help when working with JavaFX.
+ */
 public class FXUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(FXUtils.class);
@@ -114,6 +120,65 @@ public class FXUtils {
         var scene = node.getScene();
         return scene == null ? null : scene.getWindow();
     }
+
+
+    /**
+     * Get the screen that contains a node, or null if no screen contains the node.
+     * If the node spans across multiple screens, then the one with the largest overlap will be returned.
+     * @param node
+     * @return
+     */
+    public static Screen getScreen(Node node) {
+        var bounds = node.localToScreen(node.getBoundsInLocal());
+        return getMaxOverlapScreen(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+    }
+
+    /**
+     * Get the screen that contains a window, or null if no screen contains the window.
+     * If the window spans across multiple screens, then the one with the largest overlap will be returned.
+     * @param window
+     * @return
+     */
+    public static Screen getScreen(Window window) {
+        return getMaxOverlapScreen(window.getX(), window.getY(), window.getWidth(), window.getHeight());
+    }
+
+    /**
+     * Get the screen that contains the largest overlap with the specified bounding rectangle,
+     * or null if no screen overlaps with the rectangle.
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @return
+     */
+    public static Screen getMaxOverlapScreen(double x, double y, double width, double height) {
+        return getMaxOverlapScreen(new Rectangle2D(x, y, width, height));
+    }
+
+    /**
+     * Get the screen that contains the largest overlap with the specified bounding rectangle,
+     * or null if no screen overlaps with the rectangle.
+     * @param bounds
+     * @return
+     */
+    public static Screen getMaxOverlapScreen(Rectangle2D bounds) {
+        var screens = Screen.getScreensForRectangle(bounds);
+        return screens.stream().sorted(
+                Comparator.comparingDouble((Screen s) -> -computeIntersection(bounds, s.getBounds()))
+                            .thenComparing(s  -> s == Screen.getPrimary() ? -1 : 1))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static double computeIntersection(Rectangle2D b1, Rectangle2D b2) {
+        double x1 = Math.max(b1.getMinX(), b2.getMinX());
+        double y1 = Math.max(b1.getMinY(), b2.getMinY());
+        double x2 = Math.min(b1.getMaxX(), b2.getMaxX());
+        double y2 = Math.min(b1.getMaxY(), b2.getMaxY());
+        return (x2 - x1) * (y2 - y1);
+    }
+
 
     /**
      * Make a stage moveable by click and drag on the scene.

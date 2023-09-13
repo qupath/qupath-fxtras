@@ -23,6 +23,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
@@ -59,14 +60,14 @@ public class PreferenceManager {
 
     private static final Logger logger = LoggerFactory.getLogger(PreferenceManager.class);
 
-    private final Preferences preferences;
+    private ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>();
 
     private final LongProperty reloadCount = new SimpleLongProperty(0L);
     private final LongProperty resetCount = new SimpleLongProperty(0L);
 
     private PreferenceManager(Preferences preferences) {
         Objects.requireNonNull(preferences, "Preferences cannot be null");
-        this.preferences = preferences;
+        this.preferences.set(preferences);
         logger.trace("Preference manager created with name: {}", preferences.name());
     }
 
@@ -104,7 +105,7 @@ public class PreferenceManager {
      * @return
      */
     public Preferences getPreferences() {
-        return preferences;
+        return preferences.get();
     }
 
     /**
@@ -113,8 +114,12 @@ public class PreferenceManager {
      * @throws BackingStoreException
      */
     public synchronized void reset() throws BackingStoreException {
-        preferences.removeNode();
-        preferences.flush();
+        var oldPreferences = preferences.get();
+        oldPreferences.removeNode();
+        oldPreferences.flush();
+        var newPreferences = oldPreferences.isUserNode() ? Preferences.userRoot().node(oldPreferences.absolutePath()) :
+                Preferences.systemRoot().node(oldPreferences.absolutePath());
+        preferences.set(newPreferences);
         resetCount.set(resetCount.get() + 1L);
     }
 
@@ -131,7 +136,7 @@ public class PreferenceManager {
      * @throws BackingStoreException
      */
     public synchronized void save() throws BackingStoreException {
-        preferences.flush();
+        preferences.get().flush();
     }
 
     /**
@@ -141,7 +146,7 @@ public class PreferenceManager {
      */
     public String toXml() throws IOException, BackingStoreException {
         try (var stream = new ByteArrayOutputStream()) {
-            preferences.exportSubtree(stream);
+            preferences.get().exportSubtree(stream);
             return stream.toString(StandardCharsets.UTF_8);
         }
     }
@@ -156,7 +161,7 @@ public class PreferenceManager {
      */
     public BooleanProperty createPersistentBooleanProperty(String key, boolean defaultValue) {
         var prop = PrefUtils.createPersistentBooleanProperty(preferences, key, defaultValue);
-        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getBoolean(key, prop.get())));
+        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getValue().getBoolean(key, prop.get())));
         resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
         return prop;
     }
@@ -183,7 +188,7 @@ public class PreferenceManager {
      */
     public IntegerProperty createPersistentIntegerProperty(String key, int defaultValue) {
         var prop = PrefUtils.createPersistentIntegerProperty(preferences, key, defaultValue);
-        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getInt(key, prop.get())));
+        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getValue().getInt(key, prop.get())));
         resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
         return prop;
     }
@@ -210,7 +215,7 @@ public class PreferenceManager {
      */
     public FloatProperty createPersistentFloatProperty(String key, float defaultValue) {
         var prop = PrefUtils.createPersistentFloatProperty(preferences, key, defaultValue);
-        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getFloat(key, prop.get())));
+        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getValue().getFloat(key, prop.get())));
         resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
         return prop;
     }
@@ -237,7 +242,7 @@ public class PreferenceManager {
      */
     public DoubleProperty createPersistentDoubleProperty(String key, double defaultValue) {
         var prop = PrefUtils.createPersistentDoubleProperty(preferences, key, defaultValue);
-        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getDouble(key, prop.get())));
+        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getValue().getDouble(key, prop.get())));
         resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
         return prop;
     }
@@ -264,7 +269,7 @@ public class PreferenceManager {
      */
     public StringProperty createPersistentStringProperty(String key, String defaultValue) {
         var prop = PrefUtils.createPersistentStringProperty(preferences, key, defaultValue);
-        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.get(key, prop.get())));
+        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getValue().get(key, prop.get())));
         resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
         return prop;
     }
@@ -376,7 +381,7 @@ public class PreferenceManager {
     public <T> ObjectProperty<T> createPersistentObjectProperty(String key, T defaultValue, StringConverter<T> converter) {
         var prop = PrefUtils.createPersistentObjectProperty(preferences, key, defaultValue, converter);
         reloadCount.addListener((observable, oldValue, newValue) ->
-                prop.set(converter.fromString(preferences.get(key, converter.toString(prop.get())))));
+                prop.set(converter.fromString(preferences.getValue().get(key, converter.toString(prop.get())))));
         resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
         return prop;
     }

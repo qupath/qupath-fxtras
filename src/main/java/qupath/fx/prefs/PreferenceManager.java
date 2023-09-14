@@ -22,6 +22,8 @@ import javafx.beans.property.FloatProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
@@ -60,7 +62,7 @@ public class PreferenceManager {
 
     private static final Logger logger = LoggerFactory.getLogger(PreferenceManager.class);
 
-    private ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>();
+    private ReadOnlyObjectWrapper<Preferences> preferences = new ReadOnlyObjectWrapper<>();
 
     private final LongProperty reloadCount = new SimpleLongProperty(0L);
     private final LongProperty resetCount = new SimpleLongProperty(0L);
@@ -102,10 +104,25 @@ public class PreferenceManager {
 
     /**
      * Get the {@link Preferences} object backing this {@link PreferenceManager}.
-     * @return
+     * <p>
+     *     Note that the preferences object returned by this method must not be retained and reused,
+     *     because it may be invalidated by a call to {@link #reset()}.
+     *     Rather, as far as possible other methods of this class should be used rather than accessing the
+     *     {@link Preferences} directly.
+     * </p>     * @return
      */
     public Preferences getPreferences() {
         return preferences.get();
+    }
+
+    /**
+     * Get a read-only property containing the {@link Preferences} object backing this {@link PreferenceManager}.
+     * This property can be used to observe changes to the backing preferences object, which occur if the preferences
+     * are reset.
+     * @return
+     */
+    public ReadOnlyObjectProperty<Preferences> preferencesProperty() {
+        return preferences.getReadOnlyProperty();
     }
 
     /**
@@ -256,6 +273,33 @@ public class PreferenceManager {
      */
     public DoubleProperty createTransientDoubleProperty(String key, double defaultValue) {
         var prop = PrefUtils.createTransientDoubleProperty(key, defaultValue);
+        resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
+        return prop;
+    }
+
+    /**
+     * Create a long property that is persisted to the backing store with the specified key.
+     * @param key key used to store the property value, and used for the property name
+     * @param defaultValue default property value; used if the property is not found in the backing store,
+     *                     or if {@link PreferenceManager#reset()} is called.
+     * @return the property
+     */
+    public LongProperty createPersistentLongProperty(String key, long defaultValue) {
+        var prop = PrefUtils.createPersistentLongProperty(preferences, key, defaultValue);
+        reloadCount.addListener((observable, oldValue, newValue) -> prop.set(preferences.getValue().getLong(key, prop.get())));
+        resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
+        return prop;
+    }
+
+    /**
+     * Create a double property that is <b>not</b> persisted to the backing store.
+     * It can still be reset to its default value upon a call to {@link PreferenceManager#reset()}.
+     * @param key key used to store the property value, and used for the property name
+     * @param defaultValue default property value
+     * @return the property
+     */
+    public LongProperty createTransientLongProperty(String key, long defaultValue) {
+        var prop = PrefUtils.createTransientLongProperty(key, defaultValue);
         resetCount.addListener((observable, oldValue, newValue) -> prop.set(defaultValue));
         return prop;
     }

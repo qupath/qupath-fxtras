@@ -30,6 +30,7 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,74 +41,74 @@ class PrefUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PrefUtils.class);
 
-    public static BooleanProperty createPersistentBooleanProperty(Preferences prefs, String key, boolean defaultValue) {
+    public static BooleanProperty createPersistentBooleanProperty(ObservableValue<Preferences> prefs, String key, boolean defaultValue) {
         var prop = createTransientBooleanProperty(key, defaultValue);
-        prop.set(prefs.getBoolean(key, defaultValue));
-        prop.addListener((observable, oldValue, newValue) -> updateBooleanValue(prefs, key, newValue));
+        prop.set(prefs.getValue().getBoolean(key, defaultValue));
+        prop.addListener((observable, oldValue, newValue) -> updateBooleanValue(prefs.getValue(), key, newValue));
         return prop;
     }
 
-    public static IntegerProperty createPersistentIntegerProperty(Preferences prefs, String key, int defaultValue) {
+    public static IntegerProperty createPersistentIntegerProperty(ObservableValue<Preferences> prefs, String key, int defaultValue) {
         var prop = createTransientIntegerProperty(key, defaultValue);
-        prop.set(prefs.getInt(key, defaultValue));
-        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs, key, newValue));
+        prop.set(prefs.getValue().getInt(key, defaultValue));
+        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs.getValue(), key, newValue));
         return prop;
     }
 
-    public static LongProperty createPersistentLongProperty(Preferences prefs, String key, long defaultValue) {
+    public static LongProperty createPersistentLongProperty(ObservableValue<Preferences> prefs, String key, long defaultValue) {
         var prop = createTransientLongProperty(key, defaultValue);
-        prop.set(prefs.getLong(key, defaultValue));
-        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs, key, newValue));
+        prop.set(prefs.getValue().getLong(key, defaultValue));
+        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs.getValue(), key, newValue));
         return prop;
     }
 
-    public static FloatProperty createPersistentFloatProperty(Preferences prefs, String key, float defaultValue) {
+    public static FloatProperty createPersistentFloatProperty(ObservableValue<Preferences> prefs, String key, float defaultValue) {
         var prop = createTransientFloatProperty(key, defaultValue);
-        prop.set(prefs.getFloat(key, defaultValue));
-        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs, key, newValue));
+        prop.set(prefs.getValue().getFloat(key, defaultValue));
+        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs.getValue(), key, newValue));
         return prop;
     }
 
-    public static DoubleProperty createPersistentDoubleProperty(Preferences prefs, String key, double defaultValue) {
+    public static DoubleProperty createPersistentDoubleProperty(ObservableValue<Preferences> prefs, String key, double defaultValue) {
         var prop = createTransientDoubleProperty(key, defaultValue);
-        prop.set(prefs.getDouble(key, defaultValue));
-        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs, key, newValue));
+        prop.set(prefs.getValue().getDouble(key, defaultValue));
+        prop.addListener((observable, oldValue, newValue) -> updateNumericValue(prefs.getValue(), key, newValue));
         return prop;
     }
 
-    public static StringProperty createPersistentStringProperty(Preferences prefs, String key, String defaultValue) {
+    public static StringProperty createPersistentStringProperty(ObservableValue<Preferences> prefs, String key, String defaultValue) {
         var prop = createTransientStringProperty(key, defaultValue);
-        prop.set(prefs.get(key, defaultValue));
-        prop.addListener((observable, oldValue, newValue) -> updateStringValue(prefs, key, newValue));
+        prop.set(prefs.getValue().get(key, defaultValue));
+        prop.addListener((observable, oldValue, newValue) -> updateStringValue(prefs.getValue(), key, newValue));
         return prop;
     }
 
-    public static <T extends Enum> ObjectProperty<T> createPersistentEnumProperty(Preferences prefs, String key, T defaultValue) {
+    public static <T extends Enum> ObjectProperty<T> createPersistentEnumProperty(ObservableValue<Preferences> prefs, String key, T defaultValue) {
         return createPersistentEnumProperty(prefs, key, defaultValue, (Class<? extends T>)defaultValue.getClass());
     }
 
-    public static <T extends Enum> ObjectProperty<T> createPersistentEnumProperty(Preferences prefs, String key, T defaultValue, Class<? extends T> cls) {
+    public static <T extends Enum> ObjectProperty<T> createPersistentEnumProperty(ObservableValue<Preferences> prefs, String key, T defaultValue, Class<? extends T> cls) {
         var prop = createTransientEnumProperty(key, defaultValue);
         T initialValue = tryToGetEnumPreference(prefs, key, cls, defaultValue);
         prop.set(initialValue);
-        prop.addListener((observable, oldValue, newValue) -> updateEnumValue(prefs, key, newValue));
+        prop.addListener((observable, oldValue, newValue) -> updateEnumValue(prefs.getValue(), key, newValue));
         return prop;
     }
 
-    public static <T> ObjectProperty<T> createPersistentObjectProperty(Preferences prefs, String key, T defaultValue, StringConverter<? super T> converter) {
+    public static <T> ObjectProperty<T> createPersistentObjectProperty(ObservableValue<Preferences> prefs, String key, T defaultValue, StringConverter<? super T> converter) {
         var prop = createTransientObjectProperty(key, defaultValue);
-        var initialValue = prefs.get(key, null);
+        var initialValue = prefs.getValue().get(key, null);
         if (initialValue == null) {
             prop.set(defaultValue);
         } else {
             prop.set((T)converter.fromString(initialValue));
         }
-        prop.addListener((observable, oldValue, newValue) -> updateObjectValue(prefs, key, newValue, converter));
+        prop.addListener((observable, oldValue, newValue) -> updateObjectValue(prefs.getValue(), key, newValue, converter));
         return prop;
     }
 
-    static <T extends Enum> T tryToGetEnumPreference(Preferences prefs, String key, Class<? extends T> cls, T defaultValue) {
-        var defaultName = prefs.get(key, null);
+    static <T extends Enum> T tryToGetEnumPreference(ObservableValue<Preferences> prefs, String key, Class<? extends T> cls, T defaultValue) {
+        var defaultName = prefs.getValue().get(key, null);
         if (defaultName == null)
             return defaultValue;
         try {

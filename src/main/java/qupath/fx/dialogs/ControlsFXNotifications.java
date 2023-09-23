@@ -67,7 +67,11 @@ class ControlsFXNotifications {
      * Necessary to have owner when calling notifications (bug in controlsfx?).
      */
     private static Notifications createNotifications() {
-        var stage = Dialogs.getDefaultOwner();
+        // Prefer the primary owner, to avoid using a small window that happens to be available
+        var stage = Dialogs.getPrimaryWindow();
+        if (stage == null)
+            stage = Dialogs.getDefaultOwner();
+
         var notifications = Notifications.create();
         if (stage == null)
             return notifications;
@@ -82,12 +86,15 @@ class ControlsFXNotifications {
                 scene.getStylesheets().add(stylesheetUrl);
             notifications.styleClass("custom");
         }
-        // It looks better to use a screen as an owner, not a stage
-        var screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-        if (screens.isEmpty() || screens.size() > 1)
-            return notifications;
-        else
-            return notifications.owner(screens.get(0));
+        // Using the screen as the owner was problematic on macOS, because the notification could appear obscured
+        // by the dock.  Using the stage as the owner seems to work better, but we could consider making a
+        // platform-dependent decision.
+        return notifications.owner(stage);
+//        var screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+//        if (screens.isEmpty() || screens.size() > 1)
+//            return notifications;
+//        else
+//            return notifications.owner(screens.get(0));
     }
 
 }

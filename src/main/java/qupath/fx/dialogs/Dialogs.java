@@ -55,6 +55,9 @@ import java.util.Optional;
  * By contrast, 'showABCNotification' shows a notification message that will disappear without user input -
  * but only <b>if</b> ControlsFX is available.
  * If ControlsFX is not available, the notification will be shown as a non-blocking dialog box.
+ * <p>
+ * <b>Important! </b>> It is recommended to call #setPrimaryWindow(Window) before using any of these methods,
+ * to help ensure that the dialogs are shown in the correct place when an owner is not specified.
  *
  * @author Pete Bankhead
  *
@@ -323,13 +326,12 @@ public class Dialogs {
 	 */
 	public static void showErrorNotification(final String title, final Throwable e) {
 		String message = e.getLocalizedMessage();
-		if (message != null && !message.isBlank() && !message.equals(title))
-			logger.error(title + ": " + e.getLocalizedMessage(), e);
-		else
-			logger.error(title , e);
-		if (message == null)
-			message = "QuPath has encountered a problem, sorry.\nIf you can replicate it, please report it with 'Help > Report bug'.\n\n" + e;
-		if (!isHeadless())
+		if (isHeadless()) {
+			if (message != null && !message.isBlank() && !message.equals(title))
+				logger.error(title + ": " + e.getLocalizedMessage(), e);
+			else
+				logger.error(title , e);
+		} else
 			showNotification(title, message, AlertType.ERROR);
 	}
 
@@ -339,8 +341,9 @@ public class Dialogs {
 	 * @param message
 	 */
 	public static void showErrorNotification(final String title, final String message) {
-		logger.error(title + ": " + message);
-		if (!isHeadless())
+		if (isHeadless())
+			logger.error(title + ": " + message);
+		else
 			showNotification(title, message, AlertType.ERROR);
 	}
 
@@ -350,8 +353,9 @@ public class Dialogs {
 	 * @param message
 	 */
 	public static void showWarningNotification(final String title, final String message) {
-		logger.warn(title + ": " + message);
-		if (!isHeadless())
+		if (isHeadless())
+			logger.warn(title + ": " + message);
+		else
 			showNotification(title, message, AlertType.WARNING);
 	}
 
@@ -361,8 +365,9 @@ public class Dialogs {
 	 * @param message
 	 */
 	public static void showInfoNotification(final String title, final String message) {
-		logger.info(title + ": " + message);
-		if (!isHeadless())
+		if (isHeadless())
+			logger.info(title + ": " + message);
+		else
 			showNotification(title, message, AlertType.INFORMATION);
 	}
 
@@ -372,8 +377,9 @@ public class Dialogs {
 	 * @param message
 	 */
 	public static void showPlainNotification(final String title, final String message) {
-		logger.info(title + ": " + message);
-		if (!isHeadless())
+		if (isHeadless())
+			logger.info(title + ": " + message);
+		else
 			showNotification(title, message, AlertType.NONE);
 	}
 
@@ -404,8 +410,9 @@ public class Dialogs {
 	 * @param message
 	 */
 	public static void showErrorMessage(final String title, final String message) {
-		logger.error(title + ": " + message);
-		if (!isHeadless())
+		if (isHeadless())
+			logger.error(title + ": " + message);
+		else
 			showErrorMessage(title, createContentLabel(message));
 	}
 	
@@ -428,8 +435,9 @@ public class Dialogs {
 	 * @param message
 	 */
 	public static void showPlainMessage(final String title, final String message) {
-		logger.info(title + ": " + message);
-		if (!isHeadless()) {
+		if (isHeadless()) {
+			logger.info(title + ": " + message);
+		} else {
 			new Builder()
 				.alertType(AlertType.INFORMATION)
 				.title(title)
@@ -488,7 +496,20 @@ public class Dialogs {
 				.thenComparing(w -> w instanceof PopupWindow) // Don't want popup windows (e.g. a context menu)
 				.thenComparing(Window::isFocused)
 				.thenComparing(w -> w == primaryWindow)
-				.thenComparing(Dialogs::getTitle);
+				.thenComparing(Dialogs::getTitle)
+				.reversed();
+		// Retaining this code for debugging when the order is surprising...
+//		var list = new ArrayList<Window>();
+//		list.addAll(Window.getWindows());
+//		list.sort(comparator);
+//		for (var win : list) {
+//			if (win instanceof Stage stage)
+//				System.err.println(stage.getTitle() + " " + stage.getModality() + " " + stage.isFocused());
+//			else
+//				System.err.println(win + " " + win.isFocused());
+//			if (win == primaryWindow)
+//				System.err.println("--Primary");
+//		}
 		var owner = Window.getWindows().stream()
 				.sorted(comparator)
 				.findFirst()

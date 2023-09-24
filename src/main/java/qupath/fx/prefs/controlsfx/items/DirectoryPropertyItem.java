@@ -18,6 +18,7 @@ package qupath.fx.prefs.controlsfx.items;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,16 @@ public class DirectoryPropertyItem extends PropertyItem {
             prop.setValue(null);
         else
             logger.error("Cannot set property {} with value {}", prop, value);
+    }
+
+    /**
+     * Get the string property that represents the directory.
+     * This may be more useful for editors that want to bind to the text property.
+     * No check is made to ensure that the path is valid.
+     * @return
+     */
+    public Property<String> getDirectoryPathProperty() {
+        return prop;
     }
 
     @Override

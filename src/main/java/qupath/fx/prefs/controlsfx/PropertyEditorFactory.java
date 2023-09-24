@@ -79,7 +79,7 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
             return editor;
 
         if (item.getType() == File.class) {
-            editor = new DirectoryEditor(item, new TextField());
+            editor = new DirectoryEditor(item);
         } else if (item instanceof ChoicePropertyItem) {
             var choiceItem = ((ChoicePropertyItem<?>)item);
             if (choiceItem.makeSearchable()) {

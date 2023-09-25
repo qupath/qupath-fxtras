@@ -492,25 +492,12 @@ public class Dialogs {
 	 */
 	static Window getDefaultOwner() {
 		// Check modality, then popup status, then focus, then title
-		Comparator<Window> comparator = Comparator.comparing(Dialogs::isModal)
-				.thenComparing(w -> w instanceof PopupWindow) // Don't want popup windows (e.g. a context menu)
-				.thenComparing(Window::isFocused)
-				.thenComparing(w -> w == primaryWindow)
-				.thenComparing(Dialogs::getTitle)
-				.reversed();
-		// Retaining this code for debugging when the order is surprising...
-//		var list = new ArrayList<Window>();
-//		list.addAll(Window.getWindows());
-//		list.sort(comparator);
-//		for (var win : list) {
-//			if (win instanceof Stage stage)
-//				System.err.println(stage.getTitle() + " " + stage.getModality() + " " + stage.isFocused());
-//			else
-//				System.err.println(win + " " + win.isFocused());
-//			if (win == primaryWindow)
-//				System.err.println("--Primary");
-//		}
+		Comparator<Window> comparator = Comparator.comparing((Window w) -> Dialogs.isModal(w) ? -1 : 1) // Prefer modal windows
+				.thenComparing(w -> w.isFocused() ? -1 : 1) // Prefer focused windows
+				.thenComparing(w -> w == primaryWindow) // Prefer the primary window
+				.thenComparing(Dialogs::getTitle); // Finally sort by title
 		var owner = Window.getWindows().stream()
+				.filter(w -> !(w instanceof PopupWindow)) // Avoid popup windows (they don't work well as owners)
 				.sorted(comparator)
 				.findFirst()
 				.orElse(primaryWindow);

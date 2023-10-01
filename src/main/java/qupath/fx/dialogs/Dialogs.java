@@ -314,7 +314,7 @@ public class Dialogs {
 	public static void showErrorMessage(final String title, final Throwable e) {
 		String message = e.getLocalizedMessage();
 		if (message == null)
-			message = "QuPath has encountered a problem, sorry.\nIf you can replicate it, please report it with 'Help -> Report bug (web)'.\n\n" + e;
+			message = "This app has encountered a problem, sorry.\n\n" + e;
 		showErrorMessage(title, message);
 		logger.error(title, e);
 	}
@@ -485,7 +485,7 @@ public class Dialogs {
 
 	/**
 	 * Get a default owner window.
-	 * This is the main QuPath window, if available, unless we have any modal stages.
+	 * This is usually main application window, if available, unless we have any modal stages.
 	 * If we do have modal stages, and one is in focus, use that.
 	 * Otherwise, return null and let JavaFX figure out the owner.
 	 * @return

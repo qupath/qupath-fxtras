@@ -51,8 +51,6 @@ public class PredicateTextField<T> extends HBox {
 
     private static final Logger logger = LoggerFactory.getLogger(PredicateTextField.class);
 
-    private static final double DEFAULT_SPACING = 5.0;
-
     private final ObjectProperty<Function<T, String>> stringFunction = new SimpleObjectProperty<>();
 
     private final TextField tfFilter = new TextField("");
@@ -100,7 +98,6 @@ public class PredicateTextField<T> extends HBox {
             else
                 getChildren().remove(btnRegex);
         });
-        setSpacing(DEFAULT_SPACING);
     }
 
     /**

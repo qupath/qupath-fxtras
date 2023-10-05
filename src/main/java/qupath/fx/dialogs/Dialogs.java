@@ -316,7 +316,8 @@ public class Dialogs {
 		if (message == null)
 			message = "This app has encountered a problem, sorry.\n\n" + e;
 		showErrorMessage(title, message);
-		logger.error(title, e);
+		if (isHeadless())
+			logger.error(title, e);
 	}
 	
 	/**

@@ -410,11 +410,17 @@ public class Dialogs {
 	 * @param title
 	 * @param message
 	 */
-	public static void showErrorMessage(final String title, final String message) {
+	public static void showErrorMessage(final String title, String message) {
 		if (isHeadless())
 			logger.error(title + ": " + message);
-		else
-			showErrorMessage(title, createContentLabel(message));
+		else {
+			Node content;
+			if (message == null || message.isBlank())
+				content = createContentLabel("This app has encountered a problem, sorry");
+			else
+				content = createContentLabel(message);
+			showErrorMessage(title, content);
+		}
 	}
 	
 	/**

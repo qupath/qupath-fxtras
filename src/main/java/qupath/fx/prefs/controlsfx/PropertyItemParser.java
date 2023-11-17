@@ -102,10 +102,13 @@ public class PropertyItemParser {
         }
 
         for (var field : cls.getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers()) || !field.canAccess(obj) || !Property.class.isAssignableFrom(field.getType()))
+            if (Modifier.isStatic(field.getModifiers()) || !Property.class.isAssignableFrom(field.getType()))
                 continue;
             PropertySheet.Item item = null;
             try {
+                if (!field.canAccess(obj))
+                    field.setAccessible(true);
+
                 // Skip null fields
                 if (field.get(obj) == null)
                     continue;

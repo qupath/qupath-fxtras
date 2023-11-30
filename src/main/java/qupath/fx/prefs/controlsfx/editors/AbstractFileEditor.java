@@ -36,7 +36,9 @@ import org.controlsfx.glyphfont.GlyphFontRegistry;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
 import qupath.fx.dialogs.FileChoosers;
 import qupath.fx.localization.LocalizedResourceManager;
+import qupath.fx.prefs.controlsfx.items.DirectoryPropertyItem;
 import qupath.fx.prefs.controlsfx.items.FilePropertyItem;
+import qupath.fx.prefs.controlsfx.items.PropertyItem;
 
 import java.io.File;
 import java.util.Collection;
@@ -64,8 +66,14 @@ abstract class AbstractFileEditor extends AbstractPropertyEditor<File, Directory
         // TODO: Consider using listeners & paying attention to focus to avoid repeated calls
         //       when the user is entering text, but it is not yet a valid file or directory
         if (getProperty() instanceof FilePropertyItem prop) {
-            getEditor().getTextField().textProperty().bindBidirectional(prop.getFilePathProperty());
+            var tf = getEditor().getTextField();
+            tf.textProperty().bindBidirectional(prop.getFilePathProperty());
+        } else if (getProperty() instanceof DirectoryPropertyItem prop) {
+            var tf = getEditor().getTextField();
+            tf.textProperty().bindBidirectional(prop.getFilePathProperty());
         }
+        if (getProperty() instanceof PropertyItem prop)
+            getEditor().getTextField().promptTextProperty().bind(prop.promptProperty());
     }
 
     private void configureTooltip() {

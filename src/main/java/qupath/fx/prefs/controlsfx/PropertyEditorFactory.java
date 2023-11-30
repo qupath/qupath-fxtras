@@ -21,6 +21,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
@@ -107,6 +108,18 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
             combo.setCellFactory(obj -> FXUtils.createCustomListCell(formatter));
             combo.setButtonCell(FXUtils.createCustomListCell(formatter));
         }
+
+        // Handle prompt text, if necessary
+        if (item instanceof PropertyItem propItem) {
+            if (editor.getEditor() instanceof TextField tf) {
+                if (!tf.promptTextProperty().isBound())
+                    tf.promptTextProperty().bindBidirectional(propItem.promptProperty());
+            } else if (editor.getEditor() instanceof ComboBoxBase<?> combo) {
+                if (!combo.promptTextProperty().isBound())
+                    combo.promptTextProperty().bindBidirectional(propItem.promptProperty());
+            }
+        }
+
 
 //        // Make it easier to reset default locale
 //        if (Locale.class.equals(item.getType())) {

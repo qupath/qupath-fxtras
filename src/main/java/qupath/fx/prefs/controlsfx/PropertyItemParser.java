@@ -169,6 +169,7 @@ public class PropertyItemParser {
             var cls = parent.getClass();
             try {
                 var method = cls.getDeclaredMethod(choiceMethod);
+                method.setAccessible(true);
                 var result = method.invoke(parent);
                 if (result instanceof ObservableList list) {
                     builder.choices(list);

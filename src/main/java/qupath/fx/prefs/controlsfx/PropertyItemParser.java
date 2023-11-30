@@ -143,7 +143,7 @@ public class PropertyItemParser {
                         String localeCategoryBundle = annotation.bundle().isBlank() ? null : annotation.bundle();
                         String localeCategoryKey = annotation.value();
                         propertyItem.categoryKey(localeCategoryBundle, localeCategoryKey);
-                    } else {
+                    } else if (categoryKey != null) {
                         propertyItem.categoryKey(categoryBundle, categoryKey);
                     }
                 }

@@ -23,8 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for an locale preference.
- * @since v0.5.0
+ * Annotation for a locale preference.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -21,15 +21,18 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
 import javafx.collections.ObservableList;
+import javafx.stage.FileChooser;
 import org.controlsfx.control.PropertySheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import qupath.fx.dialogs.FileChoosers;
 import qupath.fx.localization.LocaleManager;
 import qupath.fx.localization.LocalizedResourceManager;
 import qupath.fx.prefs.annotations.BooleanPref;
 import qupath.fx.prefs.annotations.ColorPref;
 import qupath.fx.prefs.annotations.DirectoryPref;
 import qupath.fx.prefs.annotations.DoublePref;
+import qupath.fx.prefs.annotations.FilePref;
 import qupath.fx.prefs.annotations.IntegerPref;
 import qupath.fx.prefs.annotations.LocalePref;
 import qupath.fx.prefs.annotations.Pref;
@@ -127,6 +130,8 @@ public class PropertyItemParser {
                     item = parseItem((Property<Locale>)field.get(obj), field.getAnnotation(LocalePref.class));
                 } else if (field.isAnnotationPresent(ColorPref.class)) {
                     item = parseItem((Property<Integer>)field.get(obj), field.getAnnotation(ColorPref.class));
+                } else if (field.isAnnotationPresent(FilePref.class)) {
+                    item = parseItem((Property<String>)field.get(obj), field.getAnnotation(FilePref.class));
                 } else if (field.isAnnotationPresent(DirectoryPref.class)) {
                     item = parseItem((Property<String>)field.get(obj), field.getAnnotation(DirectoryPref.class));
                 }
@@ -165,10 +170,10 @@ public class PropertyItemParser {
             try {
                 var method = cls.getDeclaredMethod(choiceMethod);
                 var result = method.invoke(parent);
-                if (result instanceof ObservableList) {
-                    builder.choices((ObservableList)result);
-                } else if (result instanceof Collection) {
-                    builder.choices((Collection)result);
+                if (result instanceof ObservableList list) {
+                    builder.choices(list);
+                } else if (result instanceof Collection collection) {
+                    builder.choices(collection);
                 }
             } catch (Exception e) {
                 logger.error("Unable to parse choices from " + annotation + ": " + e.getMessage(), e);
@@ -236,6 +241,20 @@ public class PropertyItemParser {
                 .resourceManager(resourceManager)
                 .bundle(annotation.bundle())
                 .propertyType(PropertyItemBuilder.PropertyType.DIRECTORY)
+                .build();
+    }
+
+    private PropertySheet.Item parseItem(Property<String> property, FilePref annotation) {
+        List<FileChooser.ExtensionFilter> filters = new ArrayList<>();
+        if (annotation.extensions() != null && annotation.extensions().length > 0) {
+            filters.add(FileChoosers.createExtensionFilter(null, annotation.extensions()));
+        }
+        return buildItem(property, String.class)
+                .key(annotation.value())
+                .resourceManager(resourceManager)
+                .bundle(annotation.bundle())
+                .propertyType(PropertyItemBuilder.PropertyType.FILE)
+                .extensionFilters(filters)
                 .build();
     }
 

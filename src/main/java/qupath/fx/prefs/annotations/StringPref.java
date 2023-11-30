@@ -24,7 +24,6 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation for an String preference.
- * @since v0.5.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

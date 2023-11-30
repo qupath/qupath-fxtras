@@ -20,13 +20,10 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.FileChooser;
 import org.controlsfx.control.PropertySheet;
 import qupath.fx.localization.LocalizedResourceManager;
-import qupath.fx.prefs.controlsfx.items.ChoicePropertyItem;
-import qupath.fx.prefs.controlsfx.items.ColorPropertyItem;
-import qupath.fx.prefs.controlsfx.items.DefaultPropertyItem;
-import qupath.fx.prefs.controlsfx.items.DirectoryPropertyItem;
-import qupath.fx.prefs.controlsfx.items.PropertyItem;
+import qupath.fx.prefs.controlsfx.items.*;
 
 import java.util.Collection;
 
@@ -38,7 +35,7 @@ import java.util.Collection;
  */
 public class PropertyItemBuilder<T> {
 
-    public enum PropertyType {GENERAL, DIRECTORY, COLOR, CHOICE, SEARCHABLE_CHOICE}
+    public enum PropertyType {GENERAL, FILE, DIRECTORY, COLOR, CHOICE, SEARCHABLE_CHOICE}
 
     private LocalizedResourceManager manager;
 
@@ -57,6 +54,7 @@ public class PropertyItemBuilder<T> {
     private String name;
     private String description;
     private String category;
+    private ObservableList<? extends FileChooser.ExtensionFilter> extensionFilters;
 
     /**
      * Create a new builder for a property.
@@ -168,7 +166,7 @@ public class PropertyItemBuilder<T> {
     }
 
     /**
-     * Provide an obserable list of choices for a choice property.
+     * Provide an observable list of choices for a choice property.
      * This may be used directly, and so changes can influence the property.
      * @param choices
      * @return
@@ -181,6 +179,19 @@ public class PropertyItemBuilder<T> {
     }
 
     /**
+     * Provide a collection of file extension filters to use with a file property.
+     * For non-file properties, this are ignored.
+     * @param filters
+     * @return
+     */
+    public PropertyItemBuilder<T> extensionFilters(Collection<? extends FileChooser.ExtensionFilter> filters) {
+        this.extensionFilters = filters == null ?
+                FXCollections.emptyObservableList() :
+                FXCollections.observableArrayList(filters);
+        return this;
+    }
+
+    /**
      * Build the property item.
      * @return
      */
@@ -189,6 +200,9 @@ public class PropertyItemBuilder<T> {
         switch (propertyType) {
             case DIRECTORY:
                 item = new DirectoryPropertyItem(manager, (Property<String>) property);
+                break;
+            case FILE:
+                item = new FilePropertyItem(manager, (Property<String>) property, extensionFilters);
                 break;
             case COLOR:
                 item = new ColorPropertyItem(manager, (IntegerProperty) property);

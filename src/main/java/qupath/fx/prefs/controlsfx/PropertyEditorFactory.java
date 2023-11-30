@@ -23,20 +23,22 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
 import org.controlsfx.property.editor.PropertyEditor;
 import qupath.fx.prefs.controlsfx.editors.ChoiceEditor;
 import qupath.fx.prefs.controlsfx.editors.DirectoryEditor;
+import qupath.fx.prefs.controlsfx.editors.FileEditor;
 import qupath.fx.prefs.controlsfx.editors.SearchableChoiceEditor;
 import qupath.fx.prefs.controlsfx.items.ChoicePropertyItem;
+import qupath.fx.prefs.controlsfx.items.DirectoryPropertyItem;
+import qupath.fx.prefs.controlsfx.items.FilePropertyItem;
 import qupath.fx.prefs.controlsfx.items.PropertyItem;
 import qupath.fx.utils.FXUtils;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -78,8 +80,16 @@ public class PropertyEditorFactory extends DefaultPropertyEditorFactory {
         if (editor != null)
             return editor;
 
-        if (item.getType() == File.class) {
+        if (item instanceof DirectoryPropertyItem) {
             editor = new DirectoryEditor(item);
+        } else if (item.getType() == File.class) {
+            List<FileChooser.ExtensionFilter> filters;
+            if (item instanceof FilePropertyItem fileItem) {
+                filters = fileItem.getExtensionFilters();
+            } else {
+                filters = Collections.emptyList();
+            }
+            editor = new FileEditor(item, filters);
         } else if (item instanceof ChoicePropertyItem) {
             var choiceItem = ((ChoicePropertyItem<?>)item);
             if (choiceItem.makeSearchable()) {

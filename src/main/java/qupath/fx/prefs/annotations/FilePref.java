@@ -16,19 +16,15 @@
 
 package qupath.fx.prefs.annotations;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * Annotation for an integer preference.
+ * Annotation for a file preference.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
-public @interface IntegerPref {
+public @interface FilePref {
 	/**
 	 * Optional bundle for externalized string
 	 * @return
@@ -39,4 +35,12 @@ public @interface IntegerPref {
 	 * @return
 	 */
 	String value();
+
+	/**
+	 * Optional array of supported file extensions.
+	 * These should typically be in the JavaFX extension filter format, e.g. "*.txt"
+	 * @return
+	 */
+	String[] extensions() default {};
+
 }

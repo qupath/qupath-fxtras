@@ -348,6 +348,9 @@ public class FileChoosers {
      */
     public static FileChooser.ExtensionFilter createExtensionFilter(String description, Collection<String> extensions) {
         var extensionsCorrected = extensions.stream().map(FileChoosers::ensureExtensionFilterValid).toList();
+        // Description must not be null
+        if (description == null)
+            description = resources.getString("validFilesDescription");
         return new FileChooser.ExtensionFilter(description, extensionsCorrected);
     }
 

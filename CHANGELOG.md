@@ -1,3 +1,6 @@
+## v0.1.2
+- Support `File` preferences (not only directories)
+
 ## v0.1.1
 - Don't require annotated property `Prefs` to be accessible
   - This enables preferences to be stored in private fields

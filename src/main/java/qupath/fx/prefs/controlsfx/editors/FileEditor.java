@@ -16,16 +16,25 @@
 
 package qupath.fx.prefs.controlsfx.editors;
 
+import javafx.stage.FileChooser;
 import org.controlsfx.control.PropertySheet;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Editor for selecting directory paths.
  *
  * Appears as a text field with associated button to launch a directory chooser.
  */
-public class DirectoryEditor extends AbstractFileEditor {
+public class FileEditor extends AbstractFileEditor {
 
-    public DirectoryEditor(PropertySheet.Item property) {
-        super(property);
+    public FileEditor(PropertySheet.Item property) {
+        this(property, Collections.emptyList());
     }
+
+    public FileEditor(PropertySheet.Item property, Collection<? extends FileChooser.ExtensionFilter> extensionFilters) {
+        super(property, extensionFilters);
+    }
+
 }

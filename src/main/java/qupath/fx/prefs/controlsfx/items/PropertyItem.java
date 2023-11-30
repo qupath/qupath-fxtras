@@ -33,6 +33,7 @@ public abstract class PropertyItem implements PropertySheet.Item {
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty category = new SimpleStringProperty();
     private final StringProperty description = new SimpleStringProperty();
+    private final StringProperty prompt = new SimpleStringProperty();
 
     PropertyItem(LocalizedResourceManager manager) {
         this.manager = manager == null ? DEFAULT_MANAGER : manager;
@@ -76,12 +77,23 @@ public abstract class PropertyItem implements PropertySheet.Item {
         return this.description;
     }
 
+    /**
+     * Optional prompt property, which can be displayed in empty text fields.
+     * Obtained from the resource bundle using the key {@code key + ".prompt"}.
+     * @return
+     */
+    public StringProperty promptProperty() {
+        return this.prompt;
+    }
+
     public PropertyItem key(String bundle, String key) {
         if (bundle != null && bundle.isBlank())
             bundle = null;
         manager.registerProperty(name, bundle, key);
         if (manager.hasString(bundle, key + ".description"))
             manager.registerProperty(description, bundle, key + ".description");
+        if (manager.hasString(bundle, key + ".prompt"))
+            manager.registerProperty(prompt, bundle, key + ".prompt");
         return this;
     }
 

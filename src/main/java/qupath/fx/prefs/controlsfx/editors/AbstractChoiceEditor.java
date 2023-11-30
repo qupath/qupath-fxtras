@@ -26,6 +26,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import qupath.fx.prefs.controlsfx.items.PropertyItem;
 import qupath.fx.utils.converters.LocaleConverter;
 
 import java.util.Locale;
@@ -40,6 +41,9 @@ abstract class AbstractChoiceEditor<T, S extends ComboBox<T>> extends AbstractPr
         super(property, combo);
         if (property.getType().equals(Locale.class)) {
             combo.setConverter((StringConverter<T>)new LocaleConverter());
+        }
+        if (property instanceof PropertyItem item) {
+            combo.promptTextProperty().bind(item.promptProperty());
         }
         this.choices = choices == null ? FXCollections.observableArrayList() : choices;
         combo.getItems().setAll(this.choices);

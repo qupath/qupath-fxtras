@@ -200,7 +200,6 @@ public class Dialogs {
 				.buttons(ButtonType.YES, ButtonType.NO, ButtonType.CANCEL)
 				.title(title)
 				.content(createContentLabel(text))
-				.resizable()
 				.showAndWait()
 				.orElse(ButtonType.CANCEL);
 	}

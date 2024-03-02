@@ -1,3 +1,6 @@
+## v0.1.4
+- Make yes/no/cancel dialog non-resizable, for consistency (https://github.com/qupath/qupath-fxtras/issues/26)
+
 ## v0.1.3
 - Support prompt text for preferences using text fields or combo boxes
   - Use 'key + .prompt' within resource bundles

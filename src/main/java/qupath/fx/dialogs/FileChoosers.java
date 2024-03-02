@@ -626,7 +626,7 @@ public class FileChoosers {
             else
                 chooser.setSelectedExtensionFilter(chooser.getExtensionFilters().get(0));
 
-            if (initialDirectory != null)
+            if (initialDirectory != null && initialDirectory.isDirectory())
                 chooser.setInitialDirectory(initialDirectory);
 
             if (initialFileName != null)
@@ -651,7 +651,7 @@ public class FileChoosers {
             var chooser = new DirectoryChooser();
             if (this.titleProperty != null)
                 chooser.titleProperty().bind(titleProperty);
-            if (initialDirectory != null)
+            if (initialDirectory != null && initialDirectory.isDirectory())
                 chooser.setInitialDirectory(initialDirectory);
             return chooser;
         }

@@ -1,6 +1,5 @@
 name: Build and Publish Javadocs
 
-
 on:
   push:
     branches:
@@ -32,3 +31,22 @@ jobs:
           publish_dir: ./build/docs/javadoc
           publish_branch: gh-pages
           allow_empty_commit: true
+
+  update-symlink:
+    needs: build-and-publish-javadocs
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+      - name: Update stable symlink
+        run: |
+          rm stable
+          ln -s ${{ github.ref_name }} stable
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add stable
+          git commit -m "Update stable symlink to ${{ github.ref_name }}"
+          git push origin gh-pages

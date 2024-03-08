@@ -1,0 +1,32 @@
+name: Build and Publish Javadocs
+
+on:
+  push:
+    branches:
+      - main
+      - '*'
+
+jobs:
+  build-and-publish-javadocs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Javadocs
+        run: ./gradlew javadoc
+
+      - name: Publish Javadocs to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          destination_dir: ${{ github.ref == 'refs/heads/main' && 'latest' || github.ref }}
+          publish_dir: ./build/docs/javadoc
+          publish_branch: gh-pages
+          allow_empty_commit: true

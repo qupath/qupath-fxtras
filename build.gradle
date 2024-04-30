@@ -12,7 +12,7 @@ description = "Extra classes built on JavaFX that are used to help create the Qu
         "These don't depend on other QuPath modules, so can be reused elsewhere."
 
 group = 'io.github.qupath'
-version = '0.1.4'
+version = '0.1.5-SNAPSHOT'
 
 tasks.named('compileJava') {
     // Use the project's version or define one directly

@@ -1,3 +1,6 @@
+## v0.1.5
+- Improve behavior of `FXUtils.installSelectAllOrNoneMenu` (https://github.com/qupath/qupath/issues/1498)
+
 ## v0.1.4
 - Make yes/no/cancel dialog non-resizable, for consistency (https://github.com/qupath/qupath-fxtras/issues/26)
 - Don't set file/directory chooser initial directory if it doesn't exist

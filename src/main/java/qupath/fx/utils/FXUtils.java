@@ -27,6 +27,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
@@ -390,6 +391,12 @@ public class FXUtils {
         miNone.setOnAction(e -> combo.getCheckModel().clearChecks());
         var menu = new ContextMenu(miAll, miNone);
         combo.setContextMenu(menu);
+        // See https://github.com/qupath/qupath/issues/1498
+        combo.addEventFilter(MouseEvent.ANY, e -> {
+            if (!e.isPopupTrigger() && e.getButton().equals(MouseButton.SECONDARY)) {
+                e.consume();
+            }
+        });
     }
 
     /**

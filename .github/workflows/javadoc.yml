@@ -11,6 +11,7 @@ jobs:
   build-and-publish-javadocs:
     permissions:
       pages: write
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,6 +39,7 @@ jobs:
   update-symlink:
     permissions:
       pages: write
+      contents: write
     needs: build-and-publish-javadocs
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest

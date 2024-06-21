@@ -27,12 +27,17 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.controlsfx.control.CheckComboBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -555,6 +561,42 @@ public class FXUtils {
             pane.getStylesheets().add(css2);
         }
     }
+
+
+    /**
+     * Add shortcuts to close a window using the standard shortcuts (Shortcut+W, Esc).
+     * @param stage
+     * @see #addCloseWindowShortcuts(Stage, Collection)
+     */
+    public static void addCloseWindowShortcuts(Stage stage) {
+        addCloseWindowShortcuts(stage, Arrays.asList(
+                new KeyCodeCombination(KeyCode.W, KeyCodeCombination.SHORTCUT_DOWN),
+                new KeyCodeCombination(KeyCode.ESCAPE)
+        ));
+    }
+
+    /**
+     * Add shortcuts to close a window using the specified key combinations.
+     * These are applied as key released events, so they will not interfere with text input.
+     * @param stage
+     * @param keyCombinations
+     * @see #addCloseWindowShortcuts(Stage)
+     * @implSpec this only fires a window close request; any handler may still choose to consume the event quietly
+     */
+    public static void addCloseWindowShortcuts(Stage stage, Collection<? extends KeyCombination> keyCombinations) {
+        if (keyCombinations.isEmpty()) {
+            logger.warn("Empty list of close window shortcuts - ignoring request");
+            return;
+        }
+        stage.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
+            if (e.isConsumed())
+                return;
+            if (keyCombinations.stream().anyMatch(kc -> kc.match(e))) {
+                stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
+            }
+        });
+    }
+
 
     /**
      * Enable an undecorated stage to be moved by clicking and dragging within it.

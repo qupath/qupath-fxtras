@@ -106,6 +106,17 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#addCloseWindowShortcuts(javafx.stage.Stage)" class="member-name-link">addCloseWindowShortcuts</a><wbr>(javafx.stage.Stage&nbsp;stage)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Add shortcuts to close a window using the standard shortcuts (Shortcut+W, Esc).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#addCloseWindowShortcuts(javafx.stage.Stage,java.util.Collection)" class="member-name-link">addCloseWindowShortcuts</a><wbr>(javafx.stage.Stage&nbsp;stage,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends javafx.scene.input.KeyCombination&gt;&nbsp;keyCombinations)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Add shortcuts to close a window using the specified key combinations.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.beans.property.DoubleProperty</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#bindSliderAndTextField(javafx.scene.control.Slider,javafx.scene.control.TextField,boolean)" class="member-name-link">bindSliderAndTextField</a><wbr>(javafx.scene.control.Slider&nbsp;slider,
  javafx.scene.control.TextField&nbsp;tf,
@@ -664,6 +675,43 @@ loadScripts(document, 'script');</script>
 <dt>Parameters:</dt>
 <dd><code>pane</code> - the pane to simplify</dd>
 <dd><code>boldTitle</code> - if true, the title should be displayed in bold</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="addCloseWindowShortcuts(javafx.stage.Stage)">
+<h3>addCloseWindowShortcuts</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addCloseWindowShortcuts</span><wbr><span class="parameters">(javafx.stage.Stage&nbsp;stage)</span></div>
+<div class="block">Add shortcuts to close a window using the standard shortcuts (Shortcut+W, Esc).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>stage</code> - </dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list-long">
+<li><a href="#addCloseWindowShortcuts(javafx.stage.Stage,java.util.Collection)"><code>addCloseWindowShortcuts(Stage, Collection)</code></a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="addCloseWindowShortcuts(javafx.stage.Stage,java.util.Collection)">
+<h3>addCloseWindowShortcuts</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addCloseWindowShortcuts</span><wbr><span class="parameters">(javafx.stage.Stage&nbsp;stage,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends javafx.scene.input.KeyCombination&gt;&nbsp;keyCombinations)</span></div>
+<div class="block">Add shortcuts to close a window using the specified key combinations.
+ These are applied as key released events, so they will not interfere with text input.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>stage</code> - </dd>
+<dd><code>keyCombinations</code> - </dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="#addCloseWindowShortcuts(javafx.stage.Stage)"><code>addCloseWindowShortcuts(Stage)</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>

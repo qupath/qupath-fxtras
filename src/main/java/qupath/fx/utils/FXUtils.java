@@ -228,7 +228,7 @@ public class FXUtils {
         var parent = tabPane.getScene() == null ? null : tabPane.getScene().getWindow();
 
         double width = tabPane.getWidth();
-        double height = tabPane.getHeight();
+        double height = tabPane.prefHeight(-1);
         tabPane.getTabs().remove(tab);
         var stage = new Stage();
         stage.initOwner(parent);

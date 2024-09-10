@@ -331,8 +331,11 @@ public class Dialogs {
 				logger.error(title + ": " + e.getLocalizedMessage(), e);
 			else
 				logger.error(title , e);
-		} else
+		} else {
+			if (message == null || message.isBlank())
+				message = "Unknown error (" + e.getClass().getSimpleName() + ")";
 			showNotification(title, message, AlertType.ERROR);
+		}
 	}
 
 	/**

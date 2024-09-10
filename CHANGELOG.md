@@ -1,6 +1,7 @@
 ## v0.1.5
 - Improve behavior of `FXUtils.installSelectAllOrNoneMenu` (https://github.com/qupath/qupath/issues/1498)
 - New `FXUtils.addCloseWindowShortcuts` methods to enable closing windows from the keyboard
+- Improve error notifications when there is no associated text
 
 ## v0.1.4
 - Make yes/no/cancel dialog non-resizable, for consistency (https://github.com/qupath/qupath-fxtras/issues/26)

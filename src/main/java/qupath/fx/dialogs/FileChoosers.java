@@ -327,7 +327,7 @@ public class FileChoosers {
     /**
      * Convenience method to create a {@link javafx.stage.FileChooser.ExtensionFilter} instance
      * from a description and array of extensions.
-     * This checks to ensure that the provided extensions start with {@code ".*"}, and appends
+     * This checks to ensure that the provided extensions start with {@code "*."}, and appends
      * one or both characters if necessary.
      * @param description description of the filter
      * @param extensions file extensions associated with the filter
@@ -340,7 +340,7 @@ public class FileChoosers {
     /**
      * Convenience method to create a {@link javafx.stage.FileChooser.ExtensionFilter} instance
      * from a description and collection of extensions.
-     * This checks to ensure that the provided extensions start with {@code ".*"}, and appends
+     * This checks to ensure that the provided extensions start with {@code "*."}, and appends
      * one or both characters if necessary.
      * @param description
      * @param extensions

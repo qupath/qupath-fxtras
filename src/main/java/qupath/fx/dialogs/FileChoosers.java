@@ -190,9 +190,39 @@ public class FileChoosers {
      *           by remembering the last directory used for that owner.
      */
     public static File promptForFile(Window owner, String title, FileChooser.ExtensionFilter... extensionFilters) {
+        return promptForFile(owner, title, null, extensionFilters);
+    }
+
+    /**
+     * Prompt the user to a select a file, with an optional parent window, title and initial directory.
+     *
+     * @param owner window that owns the file chooser
+     * @param title title for the file chooser (not supported on all platforms, may be null)
+     * @param initialFile initial file or directory for the chooser; if null, an attempt will be made to choose a
+     *                    sensible initial directory
+     * @param extensionFilters optional file extension filters
+     * @return a list of files selected by the user, or null if the chooser was cancelled
+     * @implNote If the owner window is provided, it is also used to determine the initial directory for the chooser
+     *           by remembering the last directory used for that owner.
+     */
+    public static File promptForFile(Window owner, String title, File initialFile, FileChooser.ExtensionFilter... extensionFilters) {
+        File initialDir = null;
+        String initialName = null;
+        if (initialFile != null) {
+            if (initialFile.isFile()) {
+                initialDir = initialFile.getParentFile();
+                initialName = initialFile.getName();
+            } else if (initialFile.isDirectory()) {
+                initialDir = initialFile;
+            }
+        }
+        if (initialDir == null)
+            initialDir = getInitialDirectoryForOwner(owner);
+
         var chooser = buildFileChooser()
                 .title(title == null ? resources.getString("chooseFile") : title)
-                .initialDirectory(getInitialDirectoryForOwner(owner))
+                .initialDirectory(initialDir)
+                .initialFileName(initialName)
                 .extensionFilters(extensionFilters)
                 .build();
         var file = FXUtils.callOnApplicationThread(() -> chooser.showOpenDialog(getOwnerOrDefault(owner)));
@@ -591,7 +621,12 @@ public class FileChoosers {
          */
         public Builder<T> extensionFilters(Collection<? extends FileChooser.ExtensionFilter> extensionFilters) {
             this.extensionFilters.clear();
-            this.extensionFilters.addAll(extensionFilters);
+            // Because of the varargs in the method signatures, it's too easy to accidentally pass null
+            for (var filter : extensionFilters) {
+                if (filter != null) {
+                    this.extensionFilters.add(filter);
+                }
+            }
             return this;
         }
 

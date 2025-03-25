@@ -1,3 +1,6 @@
+## v0.1.6
+- Allow default directory to be set when prompting for a file with FileChoosers (https://github.com/qupath/qupath-fxtras/issues/40)
+
 ## v0.1.5
 - Improve behavior of `FXUtils.installSelectAllOrNoneMenu` (https://github.com/qupath/qupath/issues/1498)
 - New `FXUtils.addCloseWindowShortcuts` methods to enable closing windows from the keyboard

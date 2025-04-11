@@ -65,21 +65,21 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	private static final Logger logger = LoggerFactory.getLogger(InputDisplay.class);
 
 	// Owner window (for stage positioning)
-	private Window owner;
+	private final Window owner;
 
 	// All windows to listen to
-	private ObservableList<? extends Window> allWindows;
+	private final ObservableList<? extends Window> allWindows;
 
-	private BooleanProperty showProperty = new SimpleBooleanProperty(false);
+	private final BooleanProperty showProperty = new SimpleBooleanProperty(false);
 
-	private BooleanProperty showCloseButton = new SimpleBooleanProperty(true);
+	private final BooleanProperty showCloseButton = new SimpleBooleanProperty(true);
 
 	private Stage stage;
 
-	private FocusListener focusListener = new FocusListener();
-	private KeyFilter keyFilter = new KeyFilter();
-	private MouseFilter mouseFilter = new MouseFilter();
-	private ScrollFilter scrollFilter = new ScrollFilter();
+	private final FocusListener focusListener = new FocusListener();
+	private final KeyFilter keyFilter = new KeyFilter();
+	private final MouseFilter mouseFilter = new MouseFilter();
+	private final ScrollFilter scrollFilter = new ScrollFilter();
 
 	private static final String inputDisplayClass = "input-display-pane";
 	private static final String closeItemClass = "close-item";
@@ -87,23 +87,23 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	private static final PseudoClass pseudoClassActive = PseudoClass.getPseudoClass("active");
 
 	// Keys
-	private Set<KeyCode> MODIFIER_KEYS = Set.of(
+	private final Set<KeyCode> MODIFIER_KEYS = Set.of(
 			KeyCode.SHIFT, KeyCode.SHORTCUT, KeyCode.COMMAND, KeyCode.CONTROL, KeyCode.ALT, KeyCode.ALT_GRAPH
 	);
 
-	private ObservableMap<String, String> modifiers = FXCollections.observableMap(new TreeMap<>());
-	private ObservableMap<String, String> keys = FXCollections.observableMap(new TreeMap<>());
+	private final ObservableMap<String, String> modifiers = FXCollections.observableMap(new TreeMap<>());
+	private final ObservableMap<String, String> keys = FXCollections.observableMap(new TreeMap<>());
 
 	// Buttons
-	private BooleanProperty primaryDown = new SimpleBooleanProperty(false);
-	private BooleanProperty secondaryDown = new SimpleBooleanProperty(false);
-	private BooleanProperty middleDown = new SimpleBooleanProperty(false);
+	private final BooleanProperty primaryDown = new SimpleBooleanProperty(false);
+	private final BooleanProperty secondaryDown = new SimpleBooleanProperty(false);
+	private final BooleanProperty middleDown = new SimpleBooleanProperty(false);
 
 	// Scroll/wheel
-	private BooleanProperty scrollLeft = new SimpleBooleanProperty(false);
-	private BooleanProperty scrollRight = new SimpleBooleanProperty(false);
-	private BooleanProperty scrollUp = new SimpleBooleanProperty(false);
-	private BooleanProperty scrollDown = new SimpleBooleanProperty(false);
+	private final BooleanProperty scrollLeft = new SimpleBooleanProperty(false);
+	private final BooleanProperty scrollRight = new SimpleBooleanProperty(false);
+	private final BooleanProperty scrollUp = new SimpleBooleanProperty(false);
+	private final BooleanProperty scrollDown = new SimpleBooleanProperty(false);
 
 	/**
 	 * Create an input display with the specified owner window.
@@ -211,8 +211,9 @@ public class InputDisplay implements EventHandler<InputEvent> {
 		closeButton.visibleProperty().bind(showCloseButton);
 
 
-		// Set default location as the bottom left corner of the primary screen
-		var screenBounds = Screen.getPrimary().getVisualBounds();
+		// Set default location as the bottom left corner of the screen
+		Screen screen = owner == null ? Screen.getPrimary() : FXUtils.getScreenOrPrimary(owner);
+		var screenBounds = screen.getVisualBounds();
 		double xPad = 10;
 		double yPad = 10;
 

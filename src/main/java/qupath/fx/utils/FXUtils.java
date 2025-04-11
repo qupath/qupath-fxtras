@@ -143,11 +143,27 @@ public class FXUtils {
     /**
      * Get the screen that contains a window, or null if no screen contains the window.
      * If the window spans across multiple screens, then the one with the largest overlap will be returned.
-     * @param window
-     * @return
+     * @param window the window to check
+     * @return the screen containing the window, or null if no screen could be found
+     * @see #getScreenOrPrimary(Window)
      */
     public static Screen getScreen(Window window) {
-        return getMaxOverlapScreen(window.getX(), window.getY(), window.getWidth(), window.getHeight());
+        if (window == null) {
+            return null;
+        } else {
+            return getMaxOverlapScreen(window.getX(), window.getY(), window.getWidth(), window.getHeight());
+        }
+    }
+
+    /**
+     * Get the screen that contains a window, or the primary screen if no screen contains the window.
+     * @param window the window to check
+     * @return the screen containing the window, or primary screen if no other screen could be found
+     * @see #getScreen(Window)
+     */
+    public static Screen getScreenOrPrimary(Window window) {
+        var screen = getScreen(window);
+        return screen == null ? Screen.getPrimary() : screen;
     }
 
     /**

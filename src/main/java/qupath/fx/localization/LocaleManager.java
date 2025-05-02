@@ -95,7 +95,7 @@ public class LocaleManager {
     private boolean localeFilter(Locale locale) {
         if (Objects.equals(locale, baseLocale))
             return true;
-        return !locale.getLanguage().isBlank() && locale.getCountry().isEmpty() && locale != Locale.ENGLISH;
+        return !locale.getLanguage().isBlank() && locale != Locale.ENGLISH;
     }
 
     /**

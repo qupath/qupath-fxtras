@@ -99,13 +99,26 @@ loadScripts(document, 'script');</script>
 <div class="block">Create a new locale manager using the default US base locale and considering locales identified by the JVM
  as being available.</div>
 </div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.util.function.Predicate)" class="member-name-link">LocaleManager</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLanguagePredicate)</code></div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.util.function.Predicate)" class="member-name-link">LocaleManager</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLocalesPredicate)</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Create a new locale manager using the default US base locale and specified predicate to determine which locales
  should be available to the user, applied to the list of all locales identified by the JVM.</div>
 </div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.util.Locale,java.util.function.Predicate)" class="member-name-link">LocaleManager</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&nbsp;baseLocale,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.util.function.Predicate,boolean)" class="member-name-link">LocaleManager</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLocalesPredicate,
+ boolean&nbsp;useCountryCodes)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Create a new locale manager using the default US base locale and specified predicate to determine which locales
+ should be available to the user, applied to the list of all locales identified by the JVM.</div>
+</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.util.Locale,java.util.function.Predicate)" class="member-name-link">LocaleManager</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&nbsp;baseLocale,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLocalesPredicate)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Create a new locale manager using the specified base locale and predicate to determine which locales
+ should be available to the user, applied to the list of all locales identified by the JVM.</div>
+</div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.util.Locale,java.util.function.Predicate,boolean)" class="member-name-link">LocaleManager</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&nbsp;baseLocale,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLocalesPredicate,
+ boolean&nbsp;useCountryCodes)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Create a new locale manager using the specified base locale and predicate to determine which locales
  should be available to the user, applied to the list of all locales identified by the JVM.</div>
@@ -139,6 +152,11 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Refresh the list of available locales, based on the current predicate.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#useCountryCodes()" class="member-name-link">useCountryCodes</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Query whether country codes are considered.</div>
+</div>
 </div>
 </div>
 </div>
@@ -167,12 +185,27 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="&lt;init&gt;(java.util.function.Predicate)">
 <h3>LocaleManager</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">LocaleManager</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLanguagePredicate)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">LocaleManager</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLocalesPredicate)</span></div>
 <div class="block">Create a new locale manager using the default US base locale and specified predicate to determine which locales
  should be available to the user, applied to the list of all locales identified by the JVM.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>availableLanguagePredicate</code> - </dd>
+<dd><code>availableLocalesPredicate</code> - filter to apply to select which locales are available.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(java.util.function.Predicate,boolean)">
+<h3>LocaleManager</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">LocaleManager</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLocalesPredicate,
+ boolean&nbsp;useCountryCodes)</span></div>
+<div class="block">Create a new locale manager using the default US base locale and specified predicate to determine which locales
+ should be available to the user, applied to the list of all locales identified by the JVM.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>availableLocalesPredicate</code> - filter to apply to select which locales are available.</dd>
+<dd><code>useCountryCodes</code> - if true, all locales are considered; if false, locales with specific country codes are
+                        skipped.</dd>
 </dl>
 </section>
 </li>
@@ -185,8 +218,25 @@ loadScripts(document, 'script');</script>
  should be available to the user, applied to the list of all locales identified by the JVM.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>baseLocale</code> - </dd>
-<dd><code>availableLocalesPredicate</code> - </dd>
+<dd><code>baseLocale</code> - the base locale to use when determining the language to display locales to the user.</dd>
+<dd><code>availableLocalesPredicate</code> - filter to apply to select which locales are available.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(java.util.Locale,java.util.function.Predicate,boolean)">
+<h3>LocaleManager</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">LocaleManager</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&nbsp;baseLocale,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;&nbsp;availableLocalesPredicate,
+ boolean&nbsp;useCountryCodes)</span></div>
+<div class="block">Create a new locale manager using the specified base locale and predicate to determine which locales
+ should be available to the user, applied to the list of all locales identified by the JVM.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>baseLocale</code> - the base locale to use when determining the language to display locales to the user.</dd>
+<dd><code>availableLocalesPredicate</code> - filter to apply to select which locales are available.</dd>
+<dd><code>useCountryCodes</code> - if true, all locales are considered; if false, locales with specific country codes are
+                        skipped.</dd>
 </dl>
 </section>
 </li>
@@ -202,9 +252,23 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getAllLocales()">
 <h3>getAllLocales</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.collections.ObservableList&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html" title="class or interface in java.util" class="external-link">Locale</a>&gt;</span>&nbsp;<span class="element-name">getAllLocales</span>()</div>
-<div class="block">Get an observable list of all locales identified by the JVM.</div>
+<div class="block">Get an observable list of all locales identified by the JVM.
+ This may optionally exclude country-specific locales, depending upon the value of <a href="#useCountryCodes()"><code>useCountryCodes()</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="useCountryCodes()">
+<h3>useCountryCodes</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">useCountryCodes</span>()</div>
+<div class="block">Query whether country codes are considered.
+ If this returns false, locales with a non-empty country code will be ignored completely
+ (and will not be returned by calls to <a href="#getAllLocales()"><code>getAllLocales()</code></a>).</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if locales with non-empty country codes may be used, false otherwise</dd>
 </dl>
 </section>
 </li>

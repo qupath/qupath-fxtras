@@ -42,12 +42,14 @@ public class LocaleManager {
 
     private final Locale baseLocale;
 
-    private Map<String, Locale> localeMap = new TreeMap<>();
-    private StringConverter<Locale> converter;
+    private final Map<String, Locale> localeMap = new TreeMap<>();
+    private final StringConverter<Locale> converter;
 
-    private ObjectProperty<Predicate<Locale>> availableLanguagePredicateProperty = new SimpleObjectProperty<>();
+    private final boolean useCountryCodes;
 
-    private ObservableList<Locale> allLocales;
+    private final ObjectProperty<Predicate<Locale>> availableLanguagePredicateProperty = new SimpleObjectProperty<>();
+
+    private final ObservableList<Locale> allLocales;
     private ObservableList<Locale> availableLocales;
 
     /**
@@ -61,21 +63,45 @@ public class LocaleManager {
     /**
      * Create a new locale manager using the default US base locale and specified predicate to determine which locales
      * should be available to the user, applied to the list of all locales identified by the JVM.
-     * @param availableLanguagePredicate
+     * @param availableLocalesPredicate filter to apply to select which locales are available.
      */
-    public LocaleManager(Predicate<Locale> availableLanguagePredicate) {
-        this(Locale.US, availableLanguagePredicate);
+    public LocaleManager(Predicate<Locale> availableLocalesPredicate) {
+        this(availableLocalesPredicate, true);
+    }
+
+    /**
+     * Create a new locale manager using the default US base locale and specified predicate to determine which locales
+     * should be available to the user, applied to the list of all locales identified by the JVM.
+     * @param availableLocalesPredicate filter to apply to select which locales are available.
+     * @param useCountryCodes if true, all locales are considered; if false, locales with specific country codes are
+     *                        skipped.
+     */
+    public LocaleManager(Predicate<Locale> availableLocalesPredicate, boolean useCountryCodes) {
+        this(Locale.US, availableLocalesPredicate, useCountryCodes);
     }
 
     /**
      * Create a new locale manager using the specified base locale and predicate to determine which locales
      * should be available to the user, applied to the list of all locales identified by the JVM.
-     * @param baseLocale
-     * @param availableLocalesPredicate
+     * @param baseLocale the base locale to use when determining the language to display locales to the user.
+     * @param availableLocalesPredicate filter to apply to select which locales are available.
      */
     public LocaleManager(Locale baseLocale, Predicate<Locale> availableLocalesPredicate) {
+        this(baseLocale, availableLocalesPredicate, true);
+    }
+
+    /**
+     * Create a new locale manager using the specified base locale and predicate to determine which locales
+     * should be available to the user, applied to the list of all locales identified by the JVM.
+     * @param baseLocale the base locale to use when determining the language to display locales to the user.
+     * @param availableLocalesPredicate filter to apply to select which locales are available.
+     * @param useCountryCodes if true, all locales are considered; if false, locales with specific country codes are
+     *                        skipped.
+     */
+    public LocaleManager(Locale baseLocale, Predicate<Locale> availableLocalesPredicate, boolean useCountryCodes) {
         Objects.requireNonNull(baseLocale, "Base locale cannot be null");
         this.baseLocale = baseLocale;
+        this.useCountryCodes = useCountryCodes;
         this.availableLanguagePredicateProperty.set(availableLocalesPredicate);
         initializeLocaleMap();
         converter = new LocaleConverter(baseLocale);
@@ -95,15 +121,28 @@ public class LocaleManager {
     private boolean localeFilter(Locale locale) {
         if (Objects.equals(locale, baseLocale))
             return true;
-        return !locale.getLanguage().isBlank() && locale.getCountry().isEmpty() && locale != Locale.ENGLISH;
+        return !locale.getLanguage().isBlank() &&
+                (useCountryCodes || locale.getCountry().isEmpty()) &&
+                locale != Locale.ENGLISH;
     }
 
     /**
      * Get an observable list of all locales identified by the JVM.
+     * This may optionally exclude country-specific locales, depending upon the value of {@link #useCountryCodes()}.
      * @return
      */
     public ObservableList<Locale> getAllLocales() {
         return allLocales;
+    }
+
+    /**
+     * Query whether country codes are considered.
+     * If this returns false, locales with a non-empty country code will be ignored completely
+     * (and will not be returned by calls to {@link #getAllLocales()}).
+     * @return true if locales with non-empty country codes may be used, false otherwise
+     */
+    public boolean useCountryCodes() {
+        return useCountryCodes;
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 The University of Edinburgh
+ * Copyright 2023-2025 The University of Edinburgh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
@@ -226,11 +229,41 @@ public class FXUtils {
     }
 
     /**
+     * Find the first stage with a specified title.
+     * @param title the title of the stage
+     * @return an optional containing the stage if found, or empty if not found.
+     * @see #getStages()
+     */
+    public static Optional<Stage> findStageByTitle(String title) {
+        return getStages()
+                .stream()
+                .filter(s -> Objects.equals(title, s.getTitle()))
+                .findFirst();
+    }
+
+    /**
+     * Get all stages that are currently showing.
+     * <br/>
+     * This is equivalent to calling {@link Window#getWindows()} and filtering the result to only return stages.
+     * This makes it more convenient to identify windows using a stage-specific predicate, such as to check the stage
+     * title.
+     * @return a list of stages
+     * @see #findStageByTitle(String)
+     */
+    public static List<Stage> getStages() {
+        return Window.getWindows()
+                .stream()
+                .filter(w -> w instanceof Stage)
+                .map(w -> (Stage)w)
+                .toList();
+    }
+
+
+    /**
      * Make a tab undockable, via a context menu available on right-click.
      * When undocked, the tab will become a floating window.
      * If the window is closed, it will be added back to its original tab pane.
-     * @param tab
-     * @since v0.4.0
+     * @param tab the tab to make undockable
      */
     public static void makeTabUndockable(Tab tab) {
         var miUndock = new MenuItem("Undock tab");
@@ -275,8 +308,8 @@ public class FXUtils {
      * <p>
      * P.S: 'copy-pasting' an entire value (e.g. {@code '' -> '1.2E-6'}) is regarded as the opposite of 'manual typing' (e.g. {@code '' -> '-', '-' -> '-1', ...}).
      *
-     * @param textField
-     * @param allowDecimals
+     * @param textField the text field
+     * @param allowDecimals true if decimals should be permitted, false to suppose integers only
      * @implNote this is often used alongside {@link #resetSpinnerNullToPrevious(Spinner)}
      */
     public static void restrictTextFieldInputToNumber(TextField textField, boolean allowDecimals) {
@@ -620,7 +653,7 @@ public class FXUtils {
      */
     private static class MoveablePaneHandler implements EventHandler<MouseEvent> {
 
-        private Stage stage;
+        private final Stage stage;
 
         private double xOffset = 0;
         private double yOffset = 0;
@@ -652,17 +685,17 @@ public class FXUtils {
      */
     private static class NumberAndText {
 
-        private static Logger logger = LoggerFactory.getLogger(NumberAndText.class);
+        private static final Logger logger = LoggerFactory.getLogger(NumberAndText.class);
 
         private boolean synchronizingNumber = false;
         private boolean synchronizingText = false;
 
-        private DoubleProperty number;
-        private StringProperty text;
-        private int ndp;
+        private final DoubleProperty number;
+        private final StringProperty text;
+        private final int ndp;
 
-        private NumberFormat defaultFormatter;
-        private Map<Integer, NumberFormat> formatters = new HashMap<>();
+        private final NumberFormat defaultFormatter;
+        private final Map<Integer, NumberFormat> formatters = new HashMap<>();
 
         NumberAndText(DoubleProperty number, StringProperty text, int ndp) {
             this.number = number;
@@ -724,8 +757,8 @@ public class FXUtils {
 
     private static class CustomListCell<T> extends ListCell<T> {
 
-        private Function<T, String> funString;
-        private Function<T, Node> funGraphic;
+        private final Function<T, String> funString;
+        private final Function<T, Node> funGraphic;
 
         /**
          * Constructor.

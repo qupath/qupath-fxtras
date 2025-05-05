@@ -168,50 +168,60 @@ loadScripts(document, 'script');</script>
 <div class="block">Create a binding that may be used with a <code>Spinner</code> to adjust the step size dynamically
  based upon the absolute value of the input.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;javafx.scene.Node&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getContents(javafx.scene.Parent,java.util.Collection,boolean)" class="member-name-link">getContents</a><wbr>(javafx.scene.Parent&nbsp;parent,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;javafx.stage.Stage&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#findStageByTitle(java.lang.String)" class="member-name-link">findStageByTitle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Find the first stage with a specified title.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;javafx.scene.Node&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getContents(javafx.scene.Parent,java.util.Collection,boolean)" class="member-name-link">getContents</a><wbr>(javafx.scene.Parent&nbsp;parent,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;javafx.scene.Node&gt;&nbsp;collection,
  boolean&nbsp;doRecursive)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get the nodes that are included within a <code>Parent</code>, optionally adding other nodes recursively.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T extends javafx.scene.Node&gt;<br><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;T&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getContentsOfType(javafx.scene.Parent,java.lang.Class,boolean)" class="member-name-link">getContentsOfType</a><wbr>(javafx.scene.Parent&nbsp;parent,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T extends javafx.scene.Node&gt;<br><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;T&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getContentsOfType(javafx.scene.Parent,java.lang.Class,boolean)" class="member-name-link">getContentsOfType</a><wbr>(javafx.scene.Parent&nbsp;parent,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;cls,
  boolean&nbsp;doRecursive)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get the nodes of type T that are contained within a <code>Parent</code>, optionally adding other nodes
  recursively.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getMaxOverlapScreen(double,double,double,double)" class="member-name-link">getMaxOverlapScreen</a><wbr>(double&nbsp;x,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getMaxOverlapScreen(double,double,double,double)" class="member-name-link">getMaxOverlapScreen</a><wbr>(double&nbsp;x,
  double&nbsp;y,
  double&nbsp;width,
  double&nbsp;height)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Get the screen that contains the largest overlap with the specified bounding rectangle,
- or null if no screen overlaps with the rectangle.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getMaxOverlapScreen(javafx.geometry.Rectangle2D)" class="member-name-link">getMaxOverlapScreen</a><wbr>(javafx.geometry.Rectangle2D&nbsp;bounds)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get the screen that contains the largest overlap with the specified bounding rectangle,
  or null if no screen overlaps with the rectangle.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getScreen(javafx.scene.Node)" class="member-name-link">getScreen</a><wbr>(javafx.scene.Node&nbsp;node)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getMaxOverlapScreen(javafx.geometry.Rectangle2D)" class="member-name-link">getMaxOverlapScreen</a><wbr>(javafx.geometry.Rectangle2D&nbsp;bounds)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Get the screen that contains the largest overlap with the specified bounding rectangle,
+ or null if no screen overlaps with the rectangle.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getScreen(javafx.scene.Node)" class="member-name-link">getScreen</a><wbr>(javafx.scene.Node&nbsp;node)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get the screen that contains a node, or null if no screen contains the node.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getScreen(javafx.stage.Window)" class="member-name-link">getScreen</a><wbr>(javafx.stage.Window&nbsp;window)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getScreen(javafx.stage.Window)" class="member-name-link">getScreen</a><wbr>(javafx.stage.Window&nbsp;window)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get the screen that contains a window, or null if no screen contains the window.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getScreenOrPrimary(javafx.stage.Window)" class="member-name-link">getScreenOrPrimary</a><wbr>(javafx.stage.Window&nbsp;window)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Screen</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getScreenOrPrimary(javafx.stage.Window)" class="member-name-link">getScreenOrPrimary</a><wbr>(javafx.stage.Window&nbsp;window)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get the screen that contains a window, or the primary screen if no screen contains the window.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;javafx.stage.Stage&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getStages()" class="member-name-link">getStages</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Get all stages that are currently showing.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static javafx.stage.Window</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getWindow(javafx.scene.Node)" class="member-name-link">getWindow</a><wbr>(javafx.scene.Node&nbsp;node)</code></div>
@@ -447,6 +457,46 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="findStageByTitle(java.lang.String)">
+<h3>findStageByTitle</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;javafx.stage.Stage&gt;</span>&nbsp;<span class="element-name">findStageByTitle</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</span></div>
+<div class="block">Find the first stage with a specified title.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>title</code> - the title of the stage</dd>
+<dt>Returns:</dt>
+<dd>an optional containing the stage if found, or empty if not found.</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="#getStages()"><code>getStages()</code></a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getStages()">
+<h3>getStages</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;javafx.stage.Stage&gt;</span>&nbsp;<span class="element-name">getStages</span>()</div>
+<div class="block">Get all stages that are currently showing.
+ <br/>
+ This is equivalent to calling <code>Window.getWindows()</code> and filtering the result to only return stages.
+ This makes it more convenient to identify windows using a stage-specific predicate, such as to check the stage
+ title.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a list of stages</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="#findStageByTitle(java.lang.String)"><code>findStageByTitle(String)</code></a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="makeTabUndockable(javafx.scene.control.Tab)">
 <h3>makeTabUndockable</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">makeTabUndockable</span><wbr><span class="parameters">(javafx.scene.control.Tab&nbsp;tab)</span></div>
@@ -455,9 +505,7 @@ loadScripts(document, 'script');</script>
  If the window is closed, it will be added back to its original tab pane.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>tab</code> - </dd>
-<dt>Since:</dt>
-<dd>v0.4.0</dd>
+<dd><code>tab</code> - the tab to make undockable</dd>
 </dl>
 </section>
 </li>
@@ -479,8 +527,8 @@ loadScripts(document, 'script');</script>
  P.S: 'copy-pasting' an entire value (e.g. <code>'' -&gt; '1.2E-6'</code>) is regarded as the opposite of 'manual typing' (e.g. <code>'' -&gt; '-', '-' -&gt; '-1', ...</code>).</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>textField</code> - </dd>
-<dd><code>allowDecimals</code> - </dd>
+<dd><code>textField</code> - the text field</dd>
+<dd><code>allowDecimals</code> - true if decimals should be permitted, false to suppose integers only</dd>
 </dl>
 </section>
 </li>

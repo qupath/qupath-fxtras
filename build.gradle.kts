@@ -112,7 +112,8 @@ publishing {
     }
 
     publications {
-        create<MavenPublication>("pluginMaven") {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
             pom {
                 licenses {
                     license {

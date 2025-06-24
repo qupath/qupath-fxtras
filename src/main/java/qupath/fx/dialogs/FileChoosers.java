@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 The University of Edinburgh
+ * Copyright 2023 - 2025 The University of Edinburgh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -458,7 +458,7 @@ public class FileChoosers {
     }
 
     private static String ensureNameEndsWithExtension(String name, FileChooser.ExtensionFilter filter) {
-        if (filter == null || name == null || FILTER_ALL_FILES.equals(filter) || filter.getExtensions().isEmpty())
+        if (filter == null || name == null || acceptAllFiles(filter) || filter.getExtensions().isEmpty())
             return name;
         // If we match any extension variant, we can use that
         for (var extension : filter.getExtensions()) {
@@ -483,14 +483,37 @@ public class FileChoosers {
     }
 
     /**
+     * Query whether a filter contains {@code "*.*"} as an extension.
+     * @param filter the filter to check
+     * @return true if the filter contains {@code "*.*"}, false otherwise
+     */
+    private static boolean acceptAllFiles(FileChooser.ExtensionFilter filter) {
+        if (Objects.equals(FILTER_ALL_FILES, filter))
+            return true;
+        return filter.getExtensions().stream().anyMatch("*.*"::equals);
+    }
+
+    /**
+     * Query if an extension contains multiple parts, e.g. {@code .tar.gz}, {@code .ome.tif}
+     * @param ext the extension to test
+     * @return true if multiple parts are found, false otherwise
+     */
+    private static boolean isMultipartExtension(String ext) {
+        int first = ext.indexOf(".");
+        int last = ext.lastIndexOf(".");
+        return first != last;
+    }
+
+
+    /**
      * Strip everything from an extension that occurs before the first dot.
      * This can be applied to convert '*.ext' to '.ext' or '*.ext1.ext2' to '.ext1.ext2'.
      * @param extension
      * @return
      */
     private static String stripExtensionPrefix(String extension) {
-        int ind = extension.indexOf(".");
-        return ind <= 0 ? extension : extension.substring(ind);
+        int ind = extension.indexOf("*.");
+        return ind < 0 ? extension : extension.substring(ind+1);
     }
 
 
@@ -667,11 +690,20 @@ public class FileChoosers {
             if (initialFileName != null)
                 chooser.setInitialFileName(initialFileName);
             else {
-                // Try to set the initial file name to the first extension filter
+                // Try to set the initial file name using the first extension filter if we have a multi-part extension
+                // (otherwise this should happen automatically)
                 var filter = chooser.getSelectedExtensionFilter();
-                if (filter != null && filter.getExtensions().size() > 0 && !FILTER_ALL_FILES.equals(filter)) {
-                    String initialName = ensureNameEndsWithExtension("Untitled", filter);
-                    chooser.setInitialFileName(initialName);
+                if (filter != null &&
+                        !filter.getExtensions().isEmpty() &&
+                        !acceptAllFiles(filter)) {
+                    //
+                    var ext = filter.getExtensions().get(0);
+                    if (isMultipartExtension(ext)) {
+                        String initialName = "Untitled" + ext.substring(ext.indexOf("."), ext.lastIndexOf("."));
+                        // Previous code - caused problems with OS would append the last part of the extension anyway
+//                        String initialName = ensureNameEndsWithExtension("Untitled", filter);
+                        chooser.setInitialFileName(initialName);
+                    }
                 }
             }
             return chooser;
@@ -754,13 +786,19 @@ public class FileChoosers {
         stage.setScene(new Scene(new Pane()));
         stage.setTitle("Dummy");
         stage.show();
-        var file = promptToSaveFile(
-                "Some title",
-                new File("Untitled.ome.tif"),
-                createExtensionFilter(
-                        "OME-TIFF", "*.ome.tif")
-        );
-        logger.info("Selected file: {}", file);
+        for (var ext : List.of("*.txt", "*.tif", "*.ome.tif", "*.zarr", "*.ome.zarr", "*.*")) {
+            var filter = createExtensionFilter("A filter", ext);
+            var file = promptToSaveFile(
+                    "Some title",
+                    null,
+                    filter
+            );
+            if (file == null) {
+                System.out.println("No file selected for " + ext);
+                break;
+            }
+            System.out.println("Extension: " + ext + ", Selected file: " + file);
+        }
         stage.close();
     }
 

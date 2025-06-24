@@ -463,8 +463,9 @@ public class FileChoosers {
         // If we match any extension variant, we can use that
         for (var extension : filter.getExtensions()) {
             String ext = stripExtensionPrefix(extension);
-            if (name.toLowerCase().endsWith(ext.toLowerCase()))
-                return name;
+            if (name.toLowerCase().endsWith(ext.toLowerCase())) {
+                return ensureExtensionNotRepeated(name, ext);
+            }
         }
         // Take the first extension
         String ext = stripExtensionPrefix(filter.getExtensions().get(0));
@@ -474,12 +475,30 @@ public class FileChoosers {
         if (lastDotInd > 0) {
             var lastPart = ext.substring(ext.lastIndexOf("."));
             if (name.toLowerCase().endsWith(lastPart.toLowerCase()))
-                return name.substring(0, name.length() - lastPart.length()) + ext;
+                name = name.substring(0, name.length() - lastPart.length());
         }
         // Append the extension, avoiding double dots
         if (name.endsWith("."))
-            return name.substring(0, name.length()-1) + ext;
-       return name + ext;
+            name = name.substring(0, name.length()-1);
+       return ensureExtensionNotRepeated(name + ext, ext);
+    }
+
+    /**
+     * Sometimes JavaFX/the OS pops on an extra extension, so that it becomes repeated - e.g {@code image.ome.tif.ome.tif}.
+     * This attempts to correct for that, by removing any repeats.
+     * @param name the file name
+     * @param ext the extension
+     * @return the file name unchanged if there are no repeated extensions, otherwise the filename with the extension
+     *         occurring only once at the end.
+     */
+    private static String ensureExtensionNotRepeated(String name, String ext) {
+        if (ext.startsWith("*"))
+            ext = ext.substring(1);
+        ext = ext.toLowerCase();
+        while (name.toLowerCase().endsWith(ext + ext)) {
+            name = name.substring(0, name.length() - ext.length());
+        }
+        return name;
     }
 
     /**
@@ -691,11 +710,12 @@ public class FileChoosers {
                 chooser.setInitialFileName(initialFileName);
             else {
                 // Try to set the initial file name using the first extension filter if we have a multi-part extension
-                // (otherwise this should happen automatically)
+                // on macOS - otherwise, only the final part of the extension is shown
                 var filter = chooser.getSelectedExtensionFilter();
                 if (filter != null &&
                         !filter.getExtensions().isEmpty() &&
-                        !acceptAllFiles(filter)) {
+                        !acceptAllFiles(filter) &&
+                        isMac()) {
                     //
                     var ext = filter.getExtensions().get(0);
                     if (isMultipartExtension(ext)) {
@@ -708,8 +728,13 @@ public class FileChoosers {
             }
             return chooser;
         }
-
     }
+
+
+    private static boolean isMac() {
+        return System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac");
+    }
+
 
     private static class DirectoryChooserBuilder extends Builder<DirectoryChooser> {
 

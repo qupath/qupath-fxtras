@@ -11,11 +11,10 @@ on:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
-    steps:
-      - uses: qupath/actions/.github/workflows/update-gradle.yml@main
-        with:
-          gradle-version: ${{ inputs.gradle-version }}
+    uses: qupath/actions/.github/workflows/update-gradle.yml@main
+    name: Update gradle
+    with:
+      gradle-version: ${{ inputs.gradle-version }}

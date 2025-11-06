@@ -505,13 +505,26 @@ public class Dialogs {
 				.thenComparing(w -> w.isFocused() ? -1 : 1) // Prefer focused windows
 				.thenComparing(w -> w == primaryWindow) // Prefer the primary window
 				.thenComparing(Dialogs::getTitle); // Finally sort by title
-		var owner = Window.getWindows().stream()
-				.filter(w -> !(w instanceof PopupWindow)) // Avoid popup windows (they don't work well as owners)
-				.sorted(comparator)
-				.findFirst()
+        // Avoid popup windows (they don't work well as owners)
+        return Window.getWindows().stream()
+                .filter(Dialogs::maybeOwner)
+                .min(comparator)
 				.orElse(primaryWindow);
-		return owner;
 	}
+
+    private static boolean maybeOwner(Window window) {
+        // Don't accept popup windows
+        if (window instanceof PopupWindow || !window.isShowing())
+            return false;
+        // Only accept 'normal', decorated, non-transparent stages
+        if (window instanceof Stage stage) {
+            return switch (stage.getStyle()) {
+                case UNDECORATED, TRANSPARENT, UTILITY -> false;
+                default -> true;
+            };
+        }
+        return true;
+    }
 
 	private static String getTitle(Window window) {
 		String title = null;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 The University of Edinburgh
+ * Copyright 2023, 2025 The University of Edinburgh
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 
 package qupath.fx.controls;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -35,7 +37,12 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.*;
+import javafx.scene.input.InputEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -45,13 +52,21 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.Shape;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.*;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qupath.fx.utils.FXUtils;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Control to display mouse and keyboard input when interacting with a window.
@@ -87,12 +102,9 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	private static final PseudoClass pseudoClassActive = PseudoClass.getPseudoClass("active");
 
 	// Keys
-	private final Set<KeyCode> MODIFIER_KEYS = Set.of(
+	private static final Set<KeyCode> MODIFIER_KEYS = Set.of(
 			KeyCode.SHIFT, KeyCode.SHORTCUT, KeyCode.COMMAND, KeyCode.CONTROL, KeyCode.ALT, KeyCode.ALT_GRAPH
 	);
-
-	private final ObservableMap<String, String> modifiers = FXCollections.observableMap(new TreeMap<>());
-	private final ObservableMap<String, String> keys = FXCollections.observableMap(new TreeMap<>());
 
 	// Buttons
 	private final BooleanProperty primaryDown = new SimpleBooleanProperty(false);
@@ -241,6 +253,23 @@ public class InputDisplay implements EventHandler<InputEvent> {
 		return stage;
 	}
 
+    private static void bindFadingText(Label label, ObservableValue<String> text, FadeTransition fade) {
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setInterpolator(Interpolator.EASE_OUT);
+        fade.setNode(label);
+        text.addListener((v, o, n) -> {
+            if (n == null || n.isEmpty()) {
+                fade.setNode(label);
+                fade.playFromStart();
+            } else {
+                fade.stop();
+                label.setText(n);
+                label.setOpacity(1.0);
+            }
+        });
+    }
+
 
 	public BooleanProperty showProperty() {
 		return showProperty;
@@ -261,24 +290,12 @@ public class InputDisplay implements EventHandler<InputEvent> {
 		if (!showProperty.get())
 			return;
 		// Handle according to event type
-		if (event instanceof KeyEvent)
-			keyFilter.handle((KeyEvent) event);
-		else if (event instanceof MouseEvent)
-			mouseFilter.handle((MouseEvent) event);
-		else if (event instanceof ScrollEvent)
-			scrollFilter.handle((ScrollEvent) event);
-	}
-
-
-	void updateKeys(StringProperty textModifiers, StringProperty textKeys, StringProperty textHistory) {
-		textModifiers.set(String.join(" + ", modifiers.keySet()));
-		textKeys.set(String.join(" + ", keys.values()));
-		List<String> allKeys = new ArrayList<>();
-		if (!keys.isEmpty()) {
-			allKeys.addAll(modifiers.keySet());
-			allKeys.addAll(keys.values());
-			textHistory.set("Last shortcut:\n" + String.join(" + ", allKeys));
-		}
+		if (event instanceof KeyEvent keyEvent)
+			keyFilter.handle(keyEvent);
+		else if (event instanceof MouseEvent mouseEvent)
+			mouseFilter.handle(mouseEvent);
+		else if (event instanceof ScrollEvent scrollEvent)
+			scrollFilter.handle(scrollEvent);
 	}
 
 
@@ -288,10 +305,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
 		public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 			if (!showProperty.get())
 				return;
-			if (newValue) {
-				modifiers.clear();
-				keys.clear();
-			} else {
+			if (!newValue) {
 				primaryDown.set(false);
 				secondaryDown.set(false);
 				middleDown.set(false);
@@ -308,34 +322,25 @@ public class InputDisplay implements EventHandler<InputEvent> {
 		// Create labels for displaying keyboard info
 		var labModifiers = new Label("");
 		var labKeys = new Label("");
-		var labHistory = new Label("");
+        labKeys.setWrapText(true);
 
 		labModifiers.setPrefSize(width, 50);
 		labKeys.setPrefSize(width, 50);
-		labHistory.setPrefSize(width, 50);
 		labModifiers.setAlignment(Pos.CENTER);
 		labKeys.setAlignment(Pos.CENTER);
-		labHistory.setAlignment(Pos.CENTER);
-		labHistory.setTextAlignment(TextAlignment.CENTER);
 		labModifiers.getStyleClass().add("modifiers");
 		labKeys.getStyleClass().add("keys");
-		labHistory.getStyleClass().add("history");
 
-		// Listen for key changes
-		var keyUpdater = new InvalidationListener() {
-			@Override
-			public void invalidated(Observable observable) {
-				updateKeys(labModifiers.textProperty(), labKeys.textProperty(), labHistory.textProperty());
-			}
-		};
-		modifiers.addListener(keyUpdater);
-		keys.addListener(keyUpdater);
+        var fadeModifiers = new FadeTransition(Duration.seconds(5.0));
+        bindFadingText(labModifiers, keyFilter.modifierText(), fadeModifiers);
+
+        var fadeKeys = new FadeTransition(Duration.seconds(5.0));
+        bindFadingText(labKeys,  keyFilter.keyText(), fadeKeys);
 
 		// Create pane for displaying keyboard info
 		var paneKeys = new GridPane();
 		paneKeys.add(labModifiers, 0, 0);
 		paneKeys.add(labKeys, 0, 1);
-		paneKeys.add(labHistory, 0, 2);
 		return paneKeys;
 	}
 
@@ -428,37 +433,90 @@ public class InputDisplay implements EventHandler<InputEvent> {
 
 
 
-	static String getTextForEvent(KeyEvent event) {
-		String text = event.getText();
-		if (event.getCode().isLetterKey())
-			return text.toUpperCase();
-		if (text.trim().isEmpty())
-			return event.getCode().getName();
-		return text;
-	}
-
-
 	/**
 	 * Handler to log & display key events.
 	 * This separates specific modifiers from other keys,
 	 * and maintains a 'last shortcut' reference in case a key
 	 * is pressed too quickly to catch what happened.
 	 */
-	class KeyFilter implements EventHandler<KeyEvent> {
+    static class KeyFilter implements EventHandler<KeyEvent> {
+
+        private final Map<KeyCode, String> currentKeys = new LinkedHashMap<>();
+        private final Set<KeyCode> currentModifiers = new TreeSet<>();
+
+        // Holding down a key can result in repeated 'released' then 'pressed' events -
+        // so we want to delay removal to avoid responding too eagerly.
+        private final Set<KeyCode> removePending = new TreeSet<>();
+
+        private final StringProperty modifierText = new SimpleStringProperty();
+        private final StringProperty keyText = new SimpleStringProperty();
 
 		@Override
 		public void handle(KeyEvent event) {
-			// We might consider ignoring input events on TextInputControls
-			// since their effects are already visible
-//			if (event.getTarget() instanceof TextInputControl)
-//				return;
-			var set = MODIFIER_KEYS.contains(event.getCode()) ? modifiers : keys;
-			if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-				if (event.getCode() != null)
-					set.put(event.getCode().getName(), getTextForEvent(event));
-			} else if (event.getEventType() == KeyEvent.KEY_RELEASED)
-				set.remove(event.getCode().getName());
-		}
+            var code = event.getCode();
+            if (code == null)
+                return;
+
+            boolean isModifier = MODIFIER_KEYS.contains(code);
+            if (event.getEventType() == KeyEvent.KEY_PRESSED) {
+                if (isModifier) {
+                    currentModifiers.add(code);
+                    updateModifierText();
+                } else {
+                    // Inconveniently, we can't get a reliable text representation from the keycode
+                    currentKeys.put(code, event.getText().toUpperCase());
+                    updateModifierText();
+                    updateKeyText();
+                }
+                removePending.remove(code);
+            } else if (event.getEventType() == KeyEvent.KEY_RELEASED) {
+                if (removePending.add(code)) {
+                    Platform.runLater(this::handleRemove);
+                }
+            }
+
+        }
+
+        private void handleRemove() {
+            boolean keysChanged = false;
+            boolean modifiersChanged = false;
+            for (var toRemove : removePending) {
+                modifiersChanged = currentModifiers.remove(toRemove) | modifiersChanged;
+                keysChanged = currentKeys.remove(toRemove) != null | keysChanged;
+            }
+            if (currentModifiers.isEmpty()) {
+                updateModifierText();
+            }
+            if (keysChanged) {
+                updateKeyText();
+            }
+        }
+
+        private static String getText(KeyCode code) {
+            if (code.isLetterKey())
+                return code.getName().toUpperCase();
+            else if (code.isModifierKey() || code.getChar().isBlank() || code.isFunctionKey())
+                return code.getName();
+            else
+                return code.getChar();
+        }
+
+        private void updateKeyText() {
+            keyText.set(String.join("+", currentKeys.values()));
+        }
+
+        private void updateModifierText() {
+            modifierText.set(currentModifiers.stream().map(KeyFilter::getText).collect(Collectors.joining("+")));
+        }
+
+        ReadOnlyStringProperty keyText() {
+            return keyText;
+        }
+
+        ReadOnlyStringProperty modifierText() {
+            return modifierText;
+        }
+
 	}
 
 

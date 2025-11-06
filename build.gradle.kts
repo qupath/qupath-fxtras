@@ -91,8 +91,9 @@ dependencies {
     // Optional ControlsFX support (used for notifications)
     controlsfxImplementation("org.controlsfx:controlsfx:11.1.2")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("ch.qos.logback:logback-classic:1.3.11")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
+    testImplementation("org.junit.platform:junit-platform-launcher")
+    testImplementation("ch.qos.logback:logback-classic:1.5.8")
 }
 
 

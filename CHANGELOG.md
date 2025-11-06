@@ -1,3 +1,18 @@
+## v0.2.1
+- Improve Dialogs.getDefaultOwner() logic https://github.com/qupath/qupath-fxtras/pull/60
+
+## v0.2.0
+- Update gradle, version https://github.com/qupath/qupath-fxtras/pull/48
+- FXUtils commands to get stages https://github.com/qupath/qupath-fxtras/pull/47
+- Convert to kotlin https://github.com/qupath/qupath-fxtras/pull/49
+- Make the use of country codes optional https://github.com/qupath/qupath-fxtras/pull/50
+- Fix publishing https://github.com/qupath/qupath-fxtras/pull/51
+- Update version https://github.com/qupath/qupath-fxtras/pull/52
+- Improve file chooser behavior https://github.com/qupath/qupath-fxtras/pull/53
+
+## v0.1.7
+- Improve screen choice for input display https://github.com/qupath/qupath-fxtras/pull/44
+
 ## v0.1.6
 - Allow default directory to be set when prompting for a file with FileChoosers (https://github.com/qupath/qupath-fxtras/issues/40)
 

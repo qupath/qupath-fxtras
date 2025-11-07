@@ -20,8 +20,12 @@ import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -36,6 +40,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
@@ -79,6 +84,9 @@ public class InputDisplay implements EventHandler<InputEvent> {
 
 	private static final Logger logger = LoggerFactory.getLogger(InputDisplay.class);
 
+    // Needed to determine which symbols to use
+    private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
+
 	// Owner window (for stage positioning)
 	private final Window owner;
 
@@ -103,7 +111,12 @@ public class InputDisplay implements EventHandler<InputEvent> {
 
 	// Keys
 	private static final Set<KeyCode> MODIFIER_KEYS = Set.of(
-			KeyCode.SHIFT, KeyCode.SHORTCUT, KeyCode.COMMAND, KeyCode.CONTROL, KeyCode.ALT, KeyCode.ALT_GRAPH
+			KeyCode.SHIFT,
+            KeyCode.SHORTCUT,
+            KeyCode.COMMAND,
+            KeyCode.CONTROL,
+            KeyCode.ALT,
+            KeyCode.ALT_GRAPH
 	);
 
 	// Buttons
@@ -116,6 +129,18 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	private final BooleanProperty scrollRight = new SimpleBooleanProperty(false);
 	private final BooleanProperty scrollUp = new SimpleBooleanProperty(false);
 	private final BooleanProperty scrollDown = new SimpleBooleanProperty(false);
+
+    // Optionally skip showing keypresses within text fields, text areas etc.
+    private final BooleanProperty skipTextInputControls = new SimpleBooleanProperty(false);
+
+    // Duration of fade effect
+    private final ObjectProperty<Duration> fadeDurationProperty = new SimpleObjectProperty<>(Duration.seconds(5.0));
+
+    // Final opacity after fade (0 to disappear)
+    private final DoubleProperty fadeToProperty = new SimpleDoubleProperty(0.1);
+
+    // Optionally show symbols (Mac) or short forms (Windows, Linux) for modifier keys
+    private final BooleanProperty showSymbolsProperty = new SimpleBooleanProperty(true);
 
 	/**
 	 * Create an input display with the specified owner window.
@@ -253,9 +278,11 @@ public class InputDisplay implements EventHandler<InputEvent> {
 		return stage;
 	}
 
-    private static void bindFadingText(Label label, ObservableValue<String> text, FadeTransition fade) {
+    private void bindFadingText(Label label, ObservableValue<String> text) {
+        var fade = new FadeTransition();
+        fade.durationProperty().bind(fadeDurationProperty);
         fade.setFromValue(1.0);
-        fade.setToValue(0.0);
+        fade.toValueProperty().bind(fadeToProperty);
         fade.setInterpolator(Interpolator.EASE_OUT);
         fade.setNode(label);
         text.addListener((v, o, n) -> {
@@ -265,23 +292,131 @@ public class InputDisplay implements EventHandler<InputEvent> {
             } else {
                 fade.stop();
                 label.setText(n);
-                label.setOpacity(1.0);
+                label.setOpacity(fade.getFromValue());
             }
         });
     }
 
-
+    /**
+     * Whether the input display is currently showing or not.
+     * @return
+     */
 	public BooleanProperty showProperty() {
 		return showProperty;
 	}
 
+    /**
+     * Show the input display.
+     */
 	public void show() {
 		showProperty.set(true);
 	}
 
+    /**
+     * Hide the input display.
+     */
 	public void hide() {
 		showProperty.set(false);
 	}
+
+    /**
+     * Property to control whether keypresses are displayed when typing is performed
+     * within a text input control (e.g. text field, text area).
+     * @return the property
+     */
+    public BooleanProperty skipTextInputControlsProperty() {
+        return skipTextInputControls;
+    }
+
+    /**
+     * Set the value of {@link #skipTextInputControlsProperty()}.
+     * @param skip true to skip key presses within input controls, false to display them
+     */
+    public void setSkipTextInputControls(boolean skip) {
+        skipTextInputControls.set(skip);
+    }
+
+    /**
+     * Get the value of {@link #skipTextInputControlsProperty()}.
+     * @return
+     */
+    public boolean getSkipTextInputControls() {
+        return skipTextInputControls.get();
+    }
+
+    /**
+     * Property to control whether modifier keys are shown using symbols or short forms, where available.
+     * @return the property
+     */
+    public BooleanProperty showSymbolsProperty() {
+        return showSymbolsProperty;
+    }
+
+    /**
+     * Set the value of {@link #showSymbolsProperty()}.
+     * @param showSymbols true to show symbols where available, false to display text names
+     */
+    public void setShowSymbols(boolean showSymbols) {
+        showSymbolsProperty.set(showSymbols);
+    }
+
+    /**
+     * Get the value of {@link #showSymbolsProperty()}.
+     * @return true if symbols should be shown, false otherwise
+     */
+    public boolean getShowSymbols() {
+        return showSymbolsProperty.get();
+    }
+
+    /**
+     * Property to control how quickly key presses fade after the keys have been released.
+     * @return the property
+     */
+    public ObjectProperty<Duration> fadeDurationProperty() {
+        return fadeDurationProperty;
+    }
+
+    /**
+     * Set the value of {@link #fadeDurationProperty()}.
+     * @param duration) the new fade duration to use
+     */
+    public void setFadeDuration(Duration duration) {
+        fadeDurationProperty.set(duration);
+    }
+
+    /**
+     * Get the value of {@link #fadeDurationProperty()}.
+     * @return the current fade duration
+     */
+    public Duration getFadeDuration() {
+        return fadeDurationProperty.get();
+    }
+
+    /**
+     * Property to control the final opacity after fading out keypresses.
+     * This should be between 0 (completely transparent) and 1 (completely opaque).
+     * It can be used to control whether keypresses remain visible indefinitely after the key has been released.
+     * @return the property
+     */
+    public DoubleProperty fadeToProperty() {
+        return fadeToProperty;
+    }
+
+    /**
+     * Set the value of {@link #fadeToProperty()}.
+     * @param opacity) the new fade opacity to use
+     */
+    public void setFadeTo(double opacity) {
+        fadeToProperty.set(opacity);
+    }
+
+    /**
+     * Get the value of {@link #fadeToProperty()}.
+     * @return the current fade to opacity value
+     */
+    public double getFadeTo() {
+        return fadeToProperty.get();
+    }
 
 
 	@Override
@@ -324,18 +459,16 @@ public class InputDisplay implements EventHandler<InputEvent> {
 		var labKeys = new Label("");
         labKeys.setWrapText(true);
 
-		labModifiers.setPrefSize(width, 50);
-		labKeys.setPrefSize(width, 50);
-		labModifiers.setAlignment(Pos.CENTER);
-		labKeys.setAlignment(Pos.CENTER);
-		labModifiers.getStyleClass().add("modifiers");
-		labKeys.getStyleClass().add("keys");
+        labModifiers.setPrefSize(width, 50);
+        labKeys.setPrefSize(width, 50);
+        labKeys.setMaxHeight(200);
+        labModifiers.setAlignment(Pos.CENTER);
+        labKeys.setAlignment(Pos.CENTER);
+        labModifiers.getStyleClass().add("modifiers");
+        labKeys.getStyleClass().add("keys");
 
-        var fadeModifiers = new FadeTransition(Duration.seconds(5.0));
-        bindFadingText(labModifiers, keyFilter.modifierText(), fadeModifiers);
-
-        var fadeKeys = new FadeTransition(Duration.seconds(5.0));
-        bindFadingText(labKeys,  keyFilter.keyText(), fadeKeys);
+        bindFadingText(labModifiers, keyFilter.modifierText());
+        bindFadingText(labKeys,  keyFilter.keyText());
 
 		// Create pane for displaying keyboard info
 		var paneKeys = new GridPane();
@@ -439,7 +572,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	 * and maintains a 'last shortcut' reference in case a key
 	 * is pressed too quickly to catch what happened.
 	 */
-    static class KeyFilter implements EventHandler<KeyEvent> {
+    private class KeyFilter implements EventHandler<KeyEvent> {
 
         private final Map<KeyCode, String> currentKeys = new LinkedHashMap<>();
         private final Set<KeyCode> currentModifiers = new TreeSet<>();
@@ -457,6 +590,11 @@ public class InputDisplay implements EventHandler<InputEvent> {
             if (code == null)
                 return;
 
+            if (skipTextInputControls.get() && event.getTarget() instanceof TextInputControl) {
+                logger.trace("Skipping text input to {}", event.getTarget());
+                return;
+            }
+
             boolean isModifier = MODIFIER_KEYS.contains(code);
             if (event.getEventType() == KeyEvent.KEY_PRESSED) {
                 if (isModifier) {
@@ -464,7 +602,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
                     updateModifierText();
                 } else {
                     // Inconveniently, we can't get a reliable text representation from the keycode
-                    currentKeys.put(code, event.getText().toUpperCase());
+                    currentKeys.put(code, getText(event));
                     updateModifierText();
                     updateKeyText();
                 }
@@ -492,13 +630,51 @@ public class InputDisplay implements EventHandler<InputEvent> {
             }
         }
 
-        private static String getText(KeyCode code) {
+        private String getText(KeyEvent event) {
+            String text = event.getText();
+            if (event.getCode().isLetterKey())
+                return text.toUpperCase();
+            if (text.trim().isEmpty())
+                return getText(event.getCode());
+            return text;
+        }
+
+
+        private String getText(KeyCode code) {
             if (code.isLetterKey())
                 return code.getName().toUpperCase();
-            else if (code.isModifierKey() || code.getChar().isBlank() || code.isFunctionKey())
-                return code.getName();
-            else
-                return code.getChar();
+            else {
+                if (showSymbolsProperty.get()) {
+                    var symbol = getSymbol(code);
+                    if (symbol != null)
+                        return symbol;
+                }
+                if (code.isModifierKey() || code.getChar().isBlank() || code.isFunctionKey())
+                    return code.getName();
+                else
+                    return code.getChar();
+            }
+        }
+
+        private static String getSymbol(KeyCode code) {
+            return switch (code) {
+                case SHIFT -> isMac ? "⇧" : "Shift";
+                case CONTROL -> isMac ? "⌃" : "Ctrl";
+                case SHORTCUT -> isMac ? "⌘" : "Ctrl";
+                case META -> isMac ? "⌘" : "Meta";
+                case COMMAND -> isMac ? "⌘" : "Cmd";
+                case ALT -> isMac ? "⌥" : "Alt";
+                case ENTER -> "⏎";
+                case BACK_SPACE -> isMac ? "⌫" : "Backspace";
+                case LEFT -> "←";
+                case RIGHT -> "→";
+                case UP -> "↑";
+                case DOWN -> "↓";
+                case TAB ->  isMac ? "⇥" : "↹";
+                case SPACE -> "␣";
+                case ESCAPE -> "Esc";
+                default -> null;
+            };
         }
 
         private void updateKeyText() {
@@ -506,7 +682,13 @@ public class InputDisplay implements EventHandler<InputEvent> {
         }
 
         private void updateModifierText() {
-            modifierText.set(currentModifiers.stream().map(KeyFilter::getText).collect(Collectors.joining("+")));
+            if (currentModifiers.isEmpty())
+                modifierText.set("");
+            else {
+                // Concatenate with + if we aren't showing Mac symbols
+                String delim = isMac && showSymbolsProperty.get() ? "" : "+";
+                modifierText.set(currentModifiers.stream().map(this::getText).collect(Collectors.joining(delim)));
+            }
         }
 
         ReadOnlyStringProperty keyText() {
@@ -520,7 +702,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	}
 
 
-	class MouseFilter implements EventHandler<MouseEvent> {
+    private class MouseFilter implements EventHandler<MouseEvent> {
 
 		@Override
 		public void handle(MouseEvent event) {
@@ -545,7 +727,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	}
 
 
-	class ScrollFilter implements EventHandler<ScrollEvent> {
+    private class ScrollFilter implements EventHandler<ScrollEvent> {
 
 		@Override
 		public void handle(ScrollEvent event) {

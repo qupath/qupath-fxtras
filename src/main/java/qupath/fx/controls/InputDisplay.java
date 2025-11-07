@@ -594,7 +594,6 @@ public class InputDisplay implements EventHandler<InputEvent> {
                 logger.trace("Skipping text input to {}", event.getTarget());
                 return;
             }
-
             boolean isModifier = MODIFIER_KEYS.contains(code);
             if (event.getEventType() == KeyEvent.KEY_PRESSED) {
                 if (isModifier) {
@@ -633,7 +632,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
         private String getText(KeyEvent event) {
             String text = event.getText();
             if (event.getCode().isLetterKey())
-                return text.toUpperCase();
+                return event.getCode().getName().toUpperCase();
             if (text.trim().isEmpty())
                 return getText(event.getCode());
             return text;

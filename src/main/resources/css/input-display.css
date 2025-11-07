@@ -27,6 +27,7 @@
 
 .input-display-pane .keys {
     -fx-text-fill: white;
+    -fx-font-weight: bold;
     -fx-font-size: 32;
 }
 

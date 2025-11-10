@@ -116,7 +116,8 @@ public class InputDisplay implements EventHandler<InputEvent> {
             KeyCode.COMMAND,
             KeyCode.CONTROL,
             KeyCode.ALT,
-            KeyCode.ALT_GRAPH
+            KeyCode.ALT_GRAPH,
+            KeyCode.WINDOWS
 	);
 
 	// Buttons
@@ -672,6 +673,12 @@ public class InputDisplay implements EventHandler<InputEvent> {
                 case TAB ->  isMac ? "⇥" : "↹";
                 case SPACE -> "␣";
                 case ESCAPE -> "Esc";
+                case WINDOWS -> "Win";
+                case CAPS -> "⇪";
+                case HOME -> "⇱";
+                case END -> "⇲";
+                case PAGE_UP -> "⇞";
+                case PAGE_DOWN -> "⇟";
                 default -> null;
             };
         }

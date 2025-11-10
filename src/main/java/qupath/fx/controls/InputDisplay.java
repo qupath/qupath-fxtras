@@ -109,7 +109,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
 	private static final String mouseItemClass = "mouse-item";
 	private static final PseudoClass pseudoClassActive = PseudoClass.getPseudoClass("active");
 
-	// Keys
+	// Main modifier keys
 	private static final Set<KeyCode> MODIFIER_KEYS = Set.of(
 			KeyCode.SHIFT,
             KeyCode.SHORTCUT,
@@ -120,7 +120,10 @@ public class InputDisplay implements EventHandler<InputEvent> {
             KeyCode.WINDOWS
 	);
 
-	// Buttons
+    // Keys that can be locked
+    private static final Set<KeyCode> LOCKABLE_KEYS = Set.of(KeyCode.CAPS, KeyCode.NUM_LOCK);
+
+    // Buttons
 	private final BooleanProperty primaryDown = new SimpleBooleanProperty(false);
 	private final BooleanProperty secondaryDown = new SimpleBooleanProperty(false);
 	private final BooleanProperty middleDown = new SimpleBooleanProperty(false);
@@ -595,10 +598,13 @@ public class InputDisplay implements EventHandler<InputEvent> {
                 logger.trace("Skipping text input to {}", event.getTarget());
                 return;
             }
+            boolean isLockable = LOCKABLE_KEYS.contains(code);
             boolean isModifier = MODIFIER_KEYS.contains(code);
             if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-                if (isModifier) {
-                    currentModifiers.add(code);
+                if (isModifier || isLockable) {
+                    if (!isLockable || Platform.isKeyLocked(code).orElse(Boolean.FALSE)) {
+                        currentModifiers.add(code);
+                    }
                     updateModifierText();
                 } else {
                     // Inconveniently, we can't get a reliable text representation from the keycode
@@ -608,8 +614,10 @@ public class InputDisplay implements EventHandler<InputEvent> {
                 }
                 removePending.remove(code);
             } else if (event.getEventType() == KeyEvent.KEY_RELEASED) {
-                if (removePending.add(code)) {
-                    Platform.runLater(this::handleRemove);
+                if (!isLockable || !Platform.isKeyLocked(code).orElse(Boolean.FALSE)) {
+                    if (removePending.add(code)) {
+                        Platform.runLater(this::handleRemove);
+                    }
                 }
             }
 

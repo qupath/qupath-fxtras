@@ -144,7 +144,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
     private final DoubleProperty fadeToProperty = new SimpleDoubleProperty(0.1);
 
     // Optionally show symbols (Mac) or short forms (Windows, Linux) for modifier keys
-    private final BooleanProperty showSymbolsProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty showSymbolsProperty = new SimpleBooleanProperty(false);
 
 	/**
 	 * Create an input display with the specified owner window.
@@ -649,19 +649,12 @@ public class InputDisplay implements EventHandler<InputEvent> {
 
 
         private String getText(KeyCode code) {
-            if (code.isLetterKey())
-                return code.getName().toUpperCase();
-            else {
-                if (showSymbolsProperty.get()) {
-                    var symbol = getSymbol(code);
-                    if (symbol != null)
-                        return symbol;
-                }
-                if (code.isModifierKey() || code.getChar().isBlank() || code.isFunctionKey())
-                    return code.getName();
-                else
-                    return code.getChar();
-            }
+			if (showSymbolsProperty.get()) {
+				var symbol = getSymbol(code);
+				if (symbol != null)
+					return symbol;
+			}
+            return code.getName();
         }
 
         private static String getSymbol(KeyCode code) {

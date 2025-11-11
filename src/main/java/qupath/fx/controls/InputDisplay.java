@@ -120,9 +120,6 @@ public class InputDisplay implements EventHandler<InputEvent> {
             KeyCode.WINDOWS
 	);
 
-    // Keys that can be locked
-    private static final Set<KeyCode> LOCKABLE_KEYS = Set.of(KeyCode.CAPS, KeyCode.NUM_LOCK);
-
     // Buttons
 	private final BooleanProperty primaryDown = new SimpleBooleanProperty(false);
 	private final BooleanProperty secondaryDown = new SimpleBooleanProperty(false);
@@ -199,6 +196,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
 				stage.initOwner(owner);
 			}
 			stage.setAlwaysOnTop(true);
+            keyFilter.updateCapsLock();
 			stage.show();
 			stage.setOnCloseRequest(e -> {
 				showProperty.set(false);
@@ -289,10 +287,15 @@ public class InputDisplay implements EventHandler<InputEvent> {
         fade.toValueProperty().bind(fadeToProperty);
         fade.setInterpolator(Interpolator.EASE_OUT);
         fade.setNode(label);
+        String capsLock = keyFilter.getText(KeyCode.CAPS);
         text.addListener((v, o, n) -> {
             if (n == null || n.isEmpty()) {
-                fade.setNode(label);
-                fade.playFromStart();
+                if (capsLock.equals(o)) {
+                    // We want to handle caps lock immediately
+                    label.setOpacity(fade.getToValue());
+                } else {
+                    fade.playFromStart();
+                }
             } else {
                 fade.stop();
                 label.setText(n);
@@ -598,29 +601,43 @@ public class InputDisplay implements EventHandler<InputEvent> {
                 logger.trace("Skipping text input to {}", event.getTarget());
                 return;
             }
-            boolean isLockable = LOCKABLE_KEYS.contains(code);
-            boolean isModifier = MODIFIER_KEYS.contains(code);
-            if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-                if (isModifier || isLockable) {
-                    if (!isLockable || Platform.isKeyLocked(code).orElse(Boolean.FALSE)) {
+
+            if (code == KeyCode.CAPS) {
+                updateCapsLock();
+            } else {
+                // Handle anything that isn't caps lock according to pressed or released event
+                boolean isModifier = MODIFIER_KEYS.contains(code);
+                if (event.getEventType() == KeyEvent.KEY_PRESSED) {
+                    if (isModifier) {
                         currentModifiers.add(code);
+                        updateModifierText();
+                    } else {
+                        // Inconveniently, we can't get a reliable text representation from the keycode
+                        currentKeys.put(code, getText(event));
+                        updateModifierText();
+                        updateKeyText();
                     }
-                    updateModifierText();
-                } else {
-                    // Inconveniently, we can't get a reliable text representation from the keycode
-                    currentKeys.put(code, getText(event));
-                    updateModifierText();
-                    updateKeyText();
-                }
-                removePending.remove(code);
-            } else if (event.getEventType() == KeyEvent.KEY_RELEASED) {
-                if (!isLockable || !Platform.isKeyLocked(code).orElse(Boolean.FALSE)) {
+                    // If we have a not-yet-processed remove request, make sure that doesn't happen
+                    removePending.remove(code);
+                } else if (event.getEventType() == KeyEvent.KEY_RELEASED) {
                     if (removePending.add(code)) {
+                        // Delay removal in case the key is held down and will be immediately added again
                         Platform.runLater(this::handleRemove);
                     }
                 }
             }
+        }
 
+        private void updateCapsLock() {
+            // We can Handle caps lock by directly querying the key status
+            boolean changed = false;
+            if (Platform.isKeyLocked(KeyCode.CAPS).orElse(Boolean.FALSE)) {
+                changed = changed | currentModifiers.add(KeyCode.CAPS);
+            } else {
+                changed = changed | currentModifiers.remove(KeyCode.CAPS);
+            }
+            if (changed)
+                updateModifierText();
         }
 
         private void handleRemove() {
@@ -678,8 +695,8 @@ public class InputDisplay implements EventHandler<InputEvent> {
                 case RIGHT -> "→";
                 case UP -> "↑";
                 case DOWN -> "↓";
-                case TAB ->  isMac ? "⇥" : "↹";
-                case SPACE -> "␣";
+                case TAB ->  isMac ? "⇥" : "Tab";
+                case SPACE -> isMac ? "␣" : "Space";
                 case ESCAPE -> "Esc";
                 case WINDOWS -> "Win";
                 case CAPS -> "⇪";
@@ -687,6 +704,7 @@ public class InputDisplay implements EventHandler<InputEvent> {
                 case END -> "⇲";
                 case PAGE_UP -> "⇞";
                 case PAGE_DOWN -> "⇟";
+                case NUM_LOCK -> "Num lock";
                 default -> null;
             };
         }

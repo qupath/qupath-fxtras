@@ -1,3 +1,6 @@
+## v0.3.0
+- Improve `InputDisplay` https://github.com/qupath/qupath-fxtras/pull/63, https://github.com/qupath/qupath-fxtras/pull/64, https://github.com/qupath/qupath-fxtras/pull/65, https://github.com/qupath/qupath-fxtras/pull/66
+
 ## v0.2.1
 - Improve Dialogs.getDefaultOwner() logic https://github.com/qupath/qupath-fxtras/pull/60
 

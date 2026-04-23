@@ -145,6 +145,16 @@ loadScripts(document, 'script');</script>
 <div class="block">Specify the buttons to display in the dialog.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Dialogs.Builder.html" title="class in qupath.fx.dialogs">Dialogs.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#closeShortcuts()" class="member-name-link">closeShortcuts</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Request that the dialog can be easily closed by shortcut keys, including Ctrl+W.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Dialogs.Builder.html" title="class in qupath.fx.dialogs">Dialogs.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#closeShortcuts(boolean)" class="member-name-link">closeShortcuts</a><wbr>(boolean&nbsp;addShortcuts)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Optionally request that the dialog can be easily closed by shortcut keys, including Ctrl+W.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Dialogs.Builder.html" title="class in qupath.fx.dialogs">Dialogs.Builder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#confirmation()" class="member-name-link">confirmation</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Create an confirmation alert dialog.</div>
@@ -388,6 +398,44 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="closeShortcuts()">
+<h3>closeShortcuts</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Dialogs.Builder.html" title="class in qupath.fx.dialogs">Dialogs.Builder</a></span>&nbsp;<span class="element-name">closeShortcuts</span>()</div>
+<div class="block">Request that the dialog can be easily closed by shortcut keys, including Ctrl+W.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="#closeShortcuts(boolean)"><code>closeShortcuts(boolean)</code></a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="closeShortcuts(boolean)">
+<h3>closeShortcuts</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Dialogs.Builder.html" title="class in qupath.fx.dialogs">Dialogs.Builder</a></span>&nbsp;<span class="element-name">closeShortcuts</span><wbr><span class="parameters">(boolean&nbsp;addShortcuts)</span></div>
+<div class="block">Optionally request that the dialog can be easily closed by shortcut keys, including Ctrl+W.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>addShortcuts</code> - true if shortcuts should be added, false otherwise.
+                     If not specified, the default behavior depends upon the dialog buttons, 
+                     which are used as a hint to determine whether input is required.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list-long">
+<li><a href="../utils/FXUtils.html#addCloseDialogShortcuts(javafx.scene.control.DialogPane)"><code>FXUtils.addCloseDialogShortcuts(DialogPane)</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>

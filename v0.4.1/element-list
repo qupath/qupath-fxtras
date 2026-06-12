@@ -1,0 +1,11 @@
+module:qupath.fx
+qupath.fx.controls
+qupath.fx.dialogs
+qupath.fx.localization
+qupath.fx.prefs
+qupath.fx.prefs.annotations
+qupath.fx.prefs.controlsfx
+qupath.fx.prefs.controlsfx.editors
+qupath.fx.prefs.controlsfx.items
+qupath.fx.utils
+qupath.fx.utils.converters
